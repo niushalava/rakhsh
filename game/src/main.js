@@ -87,8 +87,12 @@ function handleEvents(events) {
       audio.hit();
     } else if (event.type === 'mawWake') {
       particles.burst(event.x, event.y, '#c026d3', 30, 320, 4, 0.9);
-      particles.addText(event.x, event.y - 46, 'THE MAW WAKES!', '#ff5a5a');
+      particles.addText(event.x, event.y - 46, 'THE WHITE DIV WAKES!', '#ff5a5a');
       audio.roar();
+    } else if (event.type === 'mimicReveal') {
+      particles.burst(event.x, event.y, '#c084fc', 24, 300, 4, 0.8);
+      particles.addText(event.x, event.y - 40, 'A WITCH!', '#c084fc');
+      audio.reveal();
     } else if (event.type === 'fall') {
       audio.fall();
     } else if (event.type === 'levelClear') {

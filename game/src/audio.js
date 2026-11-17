@@ -112,7 +112,12 @@ export function createAudio() {
       tone({ freq: 150, end: 45, dur: 0.3, vol: 0.35, type: 'sawtooth' });
       noise({ dur: 0.2, vol: 0.18, from: 700, to: 120 });
     },
-    // The Maw wakes: a low, rising growl.
+    // The Witch unmasked: a short, dissonant sting.
+    reveal() {
+      tone({ freq: 880, end: 220, dur: 0.25, vol: 0.25, type: 'sawtooth' });
+      tone({ freq: 932, end: 233, dur: 0.25, vol: 0.18, type: 'sawtooth', at: 0.02 });
+    },
+    // The White Div wakes: a low, rising growl.
     roar() {
       tone({ freq: 55, end: 110, dur: 0.7, vol: 0.4, type: 'sawtooth' });
       tone({ freq: 82, end: 55, dur: 0.7, vol: 0.25, type: 'square', at: 0.05 });

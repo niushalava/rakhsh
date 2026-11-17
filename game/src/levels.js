@@ -1,78 +1,78 @@
-// Levels: eleven hand-made pages of the paper world. Each level is ground
-// pieces (platforms are line segments Ember rolls on), a start, a home portal,
-// stars to collect, blots on patrol, and the ink the page grants. Gaps are
-// crossed by drawing bridges; steps are climbed by drawing ramps (gentle ones:
-// Ember's roll climbs slopes to about 50 degrees).
+// Levels: the Seven Labours of Rustam — the Haft Khan of Ferdowsi's
+// Shahnameh — retold as seven pages of the paper world. Ember follows in
+// Rustam's footsteps: the Lion, the Desert, the Dragon, the Witch, Olad,
+// Arzhang, and the White Div. Each page opens with a line from the poem
+// itself (Warner & Warner's English translation, 1906), and every star has
+// a funny line of Ember's own.
 //
-// The story: the Paper Sky went dark, and Ember — the last little light —
-// must cross eleven pages of night to reach the Dawn Door. Each page opens
-// with one story beat, and every star has a funny line Ember thinks on
-// collecting it.
+// The mechanics follow the myth: the Desert is thirst (little ink, stars
+// are springs); the Witch is a star that is not a star (a mimic blot, in
+// disguise until Ember draws near); Olad is a guide (dashed gold lines
+// show the way up the tower); the Dragon and the White Div hunt Ember.
 
 export const LEVELS = [
   {
-    name: 'First Light',
-    story: 'Ember wakes in the dark. Home is far — but the ink is warm.',
+    khan: 'I',
+    name: 'The Lion',
+    story: "He deemed it safe though it was fear's own door,\nFor in it was a lion's lair.",
     start: { x: 80, y: 470 },
     goal: { x: 880, y: 494 },
-    ink: 100,
-    platforms: [
-      { x1: 0, y1: 520, x2: 420, y2: 520 },
-      { x1: 560, y1: 520, x2: 960, y2: 520 },
-    ],
-    stars: [{ x: 490, y: 440, line: 'First star! Ember feels 12% more heroic already.' }],
-    blots: [],
-  },
-  {
-    name: 'Two Gaps',
-    story: 'The night is full of holes. Good thing Ember brought a pen.',
-    start: { x: 70, y: 470 },
-    goal: { x: 890, y: 494 },
-    ink: 110,
-    platforms: [
-      { x1: 0, y1: 520, x2: 300, y2: 520 },
-      { x1: 400, y1: 520, x2: 620, y2: 520 },
-      { x1: 720, y1: 520, x2: 960, y2: 520 },
-    ],
-    stars: [
-      { x: 350, y: 440, line: 'A star! Pocket it. Stars are light snacks.' },
-      { x: 670, y: 430, line: 'Two stars down. Ember is basically a collector now.' },
-    ],
-    blots: [],
-  },
-  {
-    name: 'The Climb',
-    story: 'Up, up — the stars are closer than they look.',
-    start: { x: 80, y: 470 },
-    goal: { x: 880, y: 354 },
     ink: 120,
-    platforms: [
-      { x1: 0, y1: 520, x2: 500, y2: 520 },
-      { x1: 520, y1: 450, x2: 640, y2: 450 },
-      { x1: 660, y1: 380, x2: 960, y2: 380 },
-    ],
-    stars: [
-      { x: 480, y: 440, line: 'Climbing pays off. Who knew?' },
-      { x: 600, y: 370, line: 'Up here the air smells like… victory. And pencil.' },
-    ],
-    blots: [],
-  },
-  {
-    name: 'Blot Alley',
-    story: 'Something moves in the dark. It is hungry. It is also slow.',
-    start: { x: 80, y: 470 },
-    goal: { x: 880, y: 494 },
-    ink: 130,
     platforms: [
       { x1: 0, y1: 520, x2: 380, y2: 520 },
       { x1: 580, y1: 520, x2: 960, y2: 520 },
     ],
-    stars: [{ x: 480, y: 420, line: "A star, right under a shadow's nose. Bold." }],
-    blots: [{ x: 480, y: 505, axis: 'x', range: 55, speed: 42 }],
+    stars: [{ x: 480, y: 420, line: "A star, right under a lion's nose. Bold." }],
+    // The Lion: big, slow, amber — Rakhsh's first trial, Ember's first blot.
+    blots: [{ x: 480, y: 505, axis: 'x', range: 55, speed: 30, radius: 20, tint: '#e8a33d' }],
   },
   {
-    name: 'Star Bridge',
-    story: 'Three stars wink from the dark. They know the way.',
+    khan: 'II',
+    name: 'The Desert',
+    story: 'A desert waterless, a heat intense\nThat dried the birds to powder.',
+    start: { x: 80, y: 470 },
+    goal: { x: 920, y: 494 },
+    ink: 100,
+    platforms: [
+      { x1: 0, y1: 520, x2: 240, y2: 520 },
+      { x1: 340, y1: 520, x2: 520, y2: 520 },
+      { x1: 620, y1: 520, x2: 780, y2: 520 },
+      { x1: 880, y1: 520, x2: 960, y2: 520 },
+    ],
+    // The stars sit low over the gaps: they are the springs, and Ember
+    // drinks them in as it crosses. Three bridges cost ~90 ink; the page
+    // grants 100 — waste nothing, or drink deep.
+    stars: [
+      { x: 290, y: 490, line: 'A spring in the desert! Ember drinks it in.' },
+      { x: 570, y: 490, line: 'Second spring. Thirst: defeated.' },
+      { x: 830, y: 490, line: "Third spring! The desert didn't stand a chance." },
+    ],
+    blots: [],
+  },
+  {
+    khan: 'III',
+    name: 'The Dragon',
+    story: "A dragon, such an one as, thou hadst said,\nNo elephant could 'scape, came from the waste.",
+    start: { x: 80, y: 470 },
+    goal: { x: 890, y: 494 },
+    ink: 150,
+    platforms: [
+      { x1: 0, y1: 520, x2: 300, y2: 520 },
+      { x1: 420, y1: 520, x2: 600, y2: 520 },
+      { x1: 720, y1: 520, x2: 960, y2: 520 },
+    ],
+    stars: [
+      { x: 360, y: 440, line: 'Grabbed mid-run. Multitasking level: Ember.' },
+      { x: 660, y: 440, line: 'A star at full speed! Somebody write this down.' },
+    ],
+    // The Dragon: the first hunt. It sleeps 3.5 seconds, then chases at 95
+    // px/s — slower than Ember's roll, but it never tires.
+    blots: [{ x: 60, y: 400, mode: 'chase', speed: 95, radius: 22, wake: 3.5, tint: '#2dd4a8' }],
+  },
+  {
+    khan: 'IV',
+    name: 'The Witch',
+    story: 'She made her cheeks like spring, although by rights\nShe was not fair.',
     start: { x: 80, y: 470 },
     goal: { x: 880, y: 494 },
     ink: 130,
@@ -80,53 +80,16 @@ export const LEVELS = [
       { x1: 0, y1: 520, x2: 330, y2: 520 },
       { x1: 630, y1: 520, x2: 960, y2: 520 },
     ],
-    stars: [
-      { x: 400, y: 430, line: 'The stars form a bridge. Suspiciously helpful.' },
-      { x: 480, y: 380, line: 'Middle star! The best seat in the sky.' },
-      { x: 560, y: 430, line: 'Three in a row. Ember should buy a lottery ticket.' },
-    ],
-    blots: [],
+    stars: [{ x: 400, y: 430, line: 'This star is real. Ember checked. Twice.' }],
+    // The Witch: a blot disguised as a star, hanging over the gap. Draw
+    // near and her true face appears — she drops onto the road and patrols
+    // it. Her halo is violet, not gold, for the keen-eyed.
+    blots: [{ x: 560, y: 430, mode: 'mimic', revealRadius: 120, axis: 'x', range: 40, speed: 35 }],
   },
   {
-    name: 'The Well',
-    story: 'Down in the well, the dark is deeper. So is the ink.',
-    start: { x: 80, y: 470 },
-    goal: { x: 880, y: 494 },
-    ink: 130,
-    platforms: [
-      { x1: 0, y1: 520, x2: 420, y2: 520 },
-      { x1: 640, y1: 520, x2: 960, y2: 520 },
-    ],
-    stars: [
-      { x: 480, y: 440, line: 'Down the well, up the score.' },
-      { x: 580, y: 400, line: 'This star was hiding. Not anymore.' },
-    ],
-    blots: [{ x: 530, y: 450, axis: 'y', range: 70, speed: 36, phase: -Math.PI / 2 }],
-  },
-  {
-    name: 'Twin Blots',
-    story: 'Two shadows, one Ember. Unfair? The ink disagrees.',
-    start: { x: 80, y: 470 },
-    goal: { x: 880, y: 494 },
-    ink: 140,
-    platforms: [
-      { x1: 0, y1: 520, x2: 280, y2: 520 },
-      { x1: 300, y1: 450, x2: 520, y2: 450 },
-      { x1: 540, y1: 520, x2: 960, y2: 520 },
-    ],
-    stars: [
-      { x: 290, y: 420, line: 'Twins on patrol, star in pocket. Worth it.' },
-      { x: 410, y: 370, line: 'Ember tiptoes. The star tiptoes back. Cute.' },
-      { x: 530, y: 420, line: "Last twin-star! The shadows didn't even notice." },
-    ],
-    blots: [
-      { x: 290, y: 470, axis: 'x', range: 26, speed: 38 },
-      { x: 530, y: 470, axis: 'x', range: 26, speed: 38 },
-    ],
-  },
-  {
-    name: 'The Tower',
-    story: 'The tallest page. The moon is watching.',
+    khan: 'V',
+    name: 'Olad',
+    story: 'The sun is captive and the stars are lassoed!',
     start: { x: 80, y: 470 },
     goal: { x: 900, y: 254 },
     ink: 180,
@@ -142,53 +105,45 @@ export const LEVELS = [
       { x: 420, y: 370, line: 'Halfway to the moon and still climbing.' },
       { x: 620, y: 290, line: 'Top of the tower! Ember waves at the moon.' },
     ],
-    // No blot here: the climb itself is the puzzle, and a blot on a ramp
-    // would eat the road out from under Ember mid-climb.
     blots: [],
+    // Olad shows the way: dashed gold lines mark the ramps to draw.
+    guide: [
+      { x1: 200, y1: 520, x2: 240, y2: 440 },
+      { x1: 400, y1: 440, x2: 440, y2: 360 },
+      { x1: 600, y1: 360, x2: 640, y2: 280 },
+      { x1: 800, y1: 280, x2: 840, y2: 280 },
+    ],
   },
   {
-    name: 'The Chase',
-    story: 'Run, little light. The night is getting impatient.',
+    khan: 'VI',
+    name: 'Arzhang',
+    story: "He shouted in the middle of the host;\nThou wouldst have said: 'The hills and seas are rent!'",
     start: { x: 80, y: 470 },
-    goal: { x: 890, y: 494 },
+    goal: { x: 920, y: 494 },
     ink: 170,
     platforms: [
-      { x1: 0, y1: 520, x2: 300, y2: 520 },
-      { x1: 660, y1: 520, x2: 960, y2: 520 },
-    ],
-    stars: [
-      { x: 380, y: 430, line: 'Grabbed mid-run. Multitasking level: Ember.' },
-      { x: 480, y: 380, line: 'A star at full speed! Somebody write this down.' },
-      { x: 580, y: 430, line: 'The night is chasing. The star is coming along.' },
-    ],
-    blots: [{ x: 480, y: 505, axis: 'x', range: 120, speed: 50 }],
-  },
-  {
-    name: 'Homecoming',
-    story: 'Almost there — the Dawn Door glows just ahead.',
-    start: { x: 80, y: 470 },
-    goal: { x: 890, y: 334 },
-    ink: 180,
-    platforms: [
       { x1: 0, y1: 520, x2: 240, y2: 520 },
-      { x1: 320, y1: 440, x2: 460, y2: 440 },
-      { x1: 560, y1: 360, x2: 700, y2: 360 },
-      { x1: 780, y1: 360, x2: 960, y2: 360 },
+      { x1: 340, y1: 520, x2: 480, y2: 520 },
+      { x1: 580, y1: 520, x2: 720, y2: 520 },
+      { x1: 820, y1: 520, x2: 960, y2: 520 },
     ],
     stars: [
-      { x: 280, y: 430, line: 'Almost home — this star smells like breakfast.' },
-      { x: 510, y: 330, line: 'Second-to-last page. Ember can see the door!' },
-      { x: 740, y: 280, line: 'One page left. Ember polishes the star. For luck.' },
+      { x: 290, y: 430, line: 'A star, mid-battle! Brave or silly? Both.' },
+      { x: 530, y: 430, line: 'The chief is watching. The star is coming along.' },
+      { x: 770, y: 430, line: 'One page left. Ember polishes the star. For luck.' },
     ],
+    // Arzhang, chief of the divs: big, red, fast — and a lieutenant beside
+    // him. Both patrol over gaps, never over islands Ember must cross, and
+    // their patrols are narrow enough that a good arc clears them.
     blots: [
-      { x: 280, y: 495, axis: 'x', range: 30, speed: 40 },
-      { x: 510, y: 395, axis: 'x', range: 35, speed: 44 },
-      { x: 740, y: 345, axis: 'x', range: 30, speed: 48 },
+      { x: 530, y: 505, axis: 'x', range: 25, speed: 50, radius: 22, tint: '#ef4444' },
+      { x: 770, y: 505, axis: 'x', range: 25, speed: 44 },
     ],
   },
   {
-    name: 'The Long Night',
-    story: 'The Maw wakes. Run, Ember. RUN.',
+    khan: 'VII',
+    name: 'The White Div',
+    story: "Now Rustam hasted not to slay the div\nAsleep, but roused him with a leopard's roar.",
     start: { x: 80, y: 470 },
     goal: { x: 920, y: 494 },
     ink: 200,
@@ -200,15 +155,16 @@ export const LEVELS = [
       { x1: 880, y1: 520, x2: 960, y2: 520 },
     ],
     stars: [
-      { x: 260, y: 440, line: 'A star, mid-chase! Brave or silly? Both.' },
-      { x: 460, y: 440, line: 'The Maw is behind. The star is ahead. Priorities.' },
-      { x: 660, y: 440, line: 'Last star ever. Ember saves it for the door.' },
+      { x: 260, y: 440, line: 'The White Div is behind. The star is ahead. Priorities.' },
+      { x: 460, y: 440, line: 'Last star ever. Ember saves it for the door.' },
+      { x: 660, y: 440, line: 'Ember does a tiny dance. The Div does not.' },
     ],
-    // The Maw: a giant shadow that sleeps 2.5 seconds (time to draw the first
-    // bridges), then hunts Ember at 112 px/s — slower than Ember's roll, so a
-    // clear road outruns it. It eats the road behind Ember; only gold ink
-    // survives it. It lurks above the start, clear of Ember, until it wakes.
-    blots: [{ x: 40, y: 400, mode: 'chase', speed: 112, radius: 30, maw: true, wake: 2.5 }],
+    // The White Div: pale as the moon, horned, and hunting. It sleeps 2.5
+    // seconds (time to draw the first bridges), then hunts Ember at 112
+    // px/s — slower than Ember's roll, so a clear road outruns it. It eats
+    // the road behind Ember; only gold ink survives it. It lurks above the
+    // start, clear of Ember, until it wakes.
+    blots: [{ x: 40, y: 400, mode: 'chase', speed: 112, radius: 30, maw: true, pale: true, wake: 2.5 }],
   },
 ];
 

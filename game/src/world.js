@@ -291,15 +291,21 @@ export function updateWorld(world, input, actions, path, dt, events) {
 
   for (const blot of world.blots) {
     updateBlot(blot, dt, world.ember, world.levelTime);
-    // The Maw waking is a moment: a roar, a shake, a burst of dark light.
+    // The White Div waking is a moment: a roar, a shake, a burst of dark light.
     if (blot.justWoke) {
       blot.justWoke = false;
       world.shake = 12;
       events.push({ type: 'mawWake', x: blot.x, y: blot.y });
     }
+    // The Witch unmasked: a sting, a shake, a burst of violet.
+    if (blot.justRevealed) {
+      blot.justRevealed = false;
+      world.shake = 6;
+      events.push({ type: 'mimicReveal', x: blot.x, y: blot.y });
+    }
   }
   for (const blot of world.blots) {
-    if (blot.sleeping) continue; // a sleeping shadow neither eats nor hunts
+    if (blot.sleeping || blot.disguised) continue; // a sleeping shadow neither eats nor hunts
     const eaten = blotEat(world.ink, blot, dt);
     for (const seg of eaten) {
       events.push({ type: 'eaten', x: (seg.x1 + seg.x2) / 2, y: (seg.y1 + seg.y2) / 2 });
@@ -333,9 +339,9 @@ export function updateWorld(world, input, actions, path, dt, events) {
   }
 
   // Blots: a touch costs a life, unless Ember is still untouchable or the
-  // blot is asleep. Ember then returns to the page's start (loseLife respawns it).
+  // blot is asleep or still disguised. Ember then returns to the page's start.
   for (const blot of world.blots) {
-    if (blot.sleeping) continue;
+    if (blot.sleeping || blot.disguised) continue;
     const d = Math.hypot(blot.x - world.ember.x, blot.y - world.ember.y);
     if (d < blot.radius + world.ember.radius && world.ember.invulnerable <= 0) {
       loseLife(world, events, 'hit');

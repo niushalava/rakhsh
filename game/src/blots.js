@@ -1,7 +1,9 @@
 // Blots: the shadows. A patrol blot drifts back and forth on a short line; a
-// chase blot (the Maw of the final page) sleeps for `wake` seconds, then hunts
-// Ember at its own speed — slower than Ember's roll, so a clear road outruns
-// it, but any delay lets it catch up. All blots eat the ink they rest on.
+// chase blot (the Dragon of the third khan, the White Div of the last) sleeps
+// for `wake` seconds, then hunts Ember at its own speed — slower than Ember's
+// roll, so a clear road outruns it, but any delay lets it catch up. A mimic
+// blot (the Witch) hangs disguised as a star until Ember draws near, then
+// drops onto the road and patrols it. All blots eat the ink they rest on.
 
 import { BLOT_RADIUS } from './config.js';
 
@@ -20,6 +22,11 @@ export function createBlot(def) {
     mode: def.mode ?? 'patrol',
     wake: def.wake ?? 0,
     maw: def.maw ?? false,
+    pale: def.pale ?? false,
+    tint: def.tint ?? null,
+    revealRadius: def.revealRadius ?? 0,
+    disguised: def.mode === 'mimic',
+    justRevealed: false,
     sleeping: (def.wake ?? 0) > 0,
     justWoke: false,
     radius: def.radius ?? BLOT_RADIUS,
@@ -36,14 +43,40 @@ export function resetBlot(blot) {
   blot.phase = 0;
   blot.sleeping = blot.wake > 0;
   blot.justWoke = false;
+  // The Witch puts her disguise back on.
+  blot.disguised = blot.mode === 'mimic';
+  blot.justRevealed = false;
 }
 
-// `target` is Ember (for chase blots); `levelTime` is the seconds since the
-// page started (for the wake delay).
+// `target` is Ember (for chase blots and mimics); `levelTime` is the seconds
+// since the page started (for the wake delay).
 export function updateBlot(blot, dt, target, levelTime) {
   blot.wobble += dt * 3;
   blot.prevX = blot.x;
   blot.prevY = blot.y;
+  if (blot.mode === 'mimic') {
+    if (blot.disguised) {
+      // She waits, fair as a star — until Ember comes within reach.
+      if (target && Math.hypot(target.x - blot.x, target.y - blot.y) <= blot.revealRadius) {
+        blot.disguised = false;
+        blot.justRevealed = true;
+        // The mask falls: she drops onto the road and patrols it.
+        blot.baseX = blot.x;
+        blot.baseY = 505;
+        blot.y = 505;
+        blot.prevY = 505;
+        blot.phase = 0;
+      }
+      return;
+    }
+    // Revealed: an ordinary patrol on the road she dropped onto.
+    blot.phase += (dt * blot.speed) / Math.max(1, blot.range);
+    const offset = Math.sin(blot.phase) * blot.range;
+    const sway = Math.sin(blot.wobble) * 4;
+    blot.x = blot.baseX + offset;
+    blot.y = blot.baseY + sway;
+    return;
+  }
   if (blot.mode === 'chase') {
     if (levelTime < blot.wake) {
       blot.sleeping = true;

@@ -21,15 +21,15 @@ export function stageShot(name, world) {
     world.ember.x = 200;
     world.ember.y = 505;
     if (world.stars[0]) world.stars[0].taken = true;
-    addLine(world, 420, 520, 560, 520);
+    addLine(world, 400, 520, 560, 520);
     return;
   }
 
   if (name === 'play') {
-    // Mid-chase on the final page (The Long Night): Ember fleeing across the
-    // islands, the Maw awake behind it, three bridges drawn and the last gap
-    // still open ahead.
-    loadLevel(world, 10);
+    // Mid-chase on the final khan (The White Div): Ember fleeing across the
+    // islands, the White Div awake behind it, three bridges drawn and the
+    // last gap still open ahead.
+    loadLevel(world, 6);
     world.screen = SCREEN_PLAY;
     world.score = 5100;
     world.best = 6106;
@@ -56,20 +56,20 @@ export function stageShot(name, world) {
     world.screen = SCREEN_CLEAR;
     world.score = 1860;
     world.best = 3420;
-    world.levelStars = 2;
+    world.levelStars = 3;
     for (const s of world.stars) s.taken = true;
-    world.clearInfo = { bonus: 390, inkBonus: 140, stars: 2, starsTotal: 2 };
+    world.clearInfo = { bonus: 390, inkBonus: 140, stars: 3, starsTotal: 3 };
     return;
   }
 
   if (name === 'victory') {
-    loadLevel(world, 10);
+    loadLevel(world, 6);
     world.screen = SCREEN_VICTORY;
     world.score = 6240;
     world.best = 6240;
     world.newBest = true;
     world.starsTotal = 16;
-    // The Maw, left behind in the dark.
+    // The White Div, left behind in the dark.
     if (world.blots[0]) {
       world.blots[0].x = 320;
       world.blots[0].y = 470;

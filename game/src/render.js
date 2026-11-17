@@ -45,13 +45,15 @@ function drawHeart(ctx, x, y, size, fill) {
   ctx.restore();
 }
 
+// An eight-pointed star, the khatam of Persian art — the shape of every
+// collectible star and of the ornaments on the page's illuminated border.
 function drawStar(ctx, x, y, r, rot = 0) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(rot);
   ctx.beginPath();
-  for (let i = 0; i < 10; i += 1) {
-    const angle = (i / 10) * Math.PI * 2 - Math.PI / 2;
+  for (let i = 0; i < 16; i += 1) {
+    const angle = (i / 16) * Math.PI * 2 - Math.PI / 2;
     const rad = i % 2 === 0 ? r : r * 0.45;
     const px = Math.cos(angle) * rad;
     const py = Math.sin(angle) * rad;
@@ -60,6 +62,20 @@ function drawStar(ctx, x, y, r, rot = 0) {
   }
   ctx.closePath();
   ctx.restore();
+}
+
+// A pointed arch: straight sides rising from the ground line, then two
+// curves meeting at a point. `w` is the half-width, `h` the height.
+function archPath(ctx, x, y, w, h) {
+  const base = y + 26;
+  const spring = y - h * 0.45;
+  const apex = y - h;
+  ctx.beginPath();
+  ctx.moveTo(x - w, base);
+  ctx.lineTo(x - w, spring);
+  ctx.quadraticCurveTo(x - w, apex + h * 0.18, x, apex);
+  ctx.quadraticCurveTo(x + w, apex + h * 0.18, x + w, spring);
+  ctx.lineTo(x + w, base);
 }
 
 function glowDot(ctx, x, y, radius, color, coreColor) {
@@ -150,6 +166,37 @@ export function createRenderer(canvas) {
     bctx.moveTo(0, y);
     bctx.lineTo(STAGE_W, y);
     bctx.stroke();
+  }
+  // Cypresses: the dark trees of Persian miniatures, silhouetted along the
+  // bottom of the page, behind the platforms.
+  const cypresses = [
+    { x: 70, h: 120, w: 26 },
+    { x: 320, h: 90, w: 20 },
+    { x: 700, h: 140, w: 30 },
+    { x: 905, h: 100, w: 22 },
+  ];
+  bctx.fillStyle = 'rgba(8, 18, 14, 0.6)';
+  for (const c of cypresses) {
+    const top = STAGE_H - c.h;
+    bctx.beginPath();
+    bctx.moveTo(c.x - c.w / 2, STAGE_H);
+    bctx.quadraticCurveTo(c.x - c.w / 2, top + c.h * 0.4, c.x, top);
+    bctx.quadraticCurveTo(c.x + c.w / 2, top + c.h * 0.4, c.x + c.w / 2, STAGE_H);
+    bctx.closePath();
+    bctx.fill();
+  }
+  // The illuminated border: a double gold rule, like a manuscript page,
+  // with an eight-pointed star at each corner.
+  bctx.strokeStyle = 'rgba(255, 215, 106, 0.30)';
+  bctx.lineWidth = 1.5;
+  bctx.strokeRect(10, 10, STAGE_W - 20, STAGE_H - 20);
+  bctx.strokeStyle = 'rgba(255, 215, 106, 0.16)';
+  bctx.lineWidth = 1;
+  bctx.strokeRect(14, 14, STAGE_W - 28, STAGE_H - 28);
+  bctx.fillStyle = 'rgba(255, 215, 106, 0.5)';
+  for (const [cx, cy] of [[12, 12], [STAGE_W - 12, 12], [12, STAGE_H - 12], [STAGE_W - 12, STAGE_H - 12]]) {
+    drawStar(bctx, cx, cy, 6, 0);
+    bctx.fill();
   }
 
   // Fireflies: drifting motes of warm light, seeded so a screenshot is the
@@ -263,38 +310,59 @@ export function createRenderer(canvas) {
   function drawPortal(goal, time) {
     const x = goal.x;
     const y = goal.y;
+    // Light spilling from the Dawn Door.
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const beam = ctx.createLinearGradient(x, y - 90, x, y + 30);
+    const beam = ctx.createLinearGradient(x, y - 110, x, y + 30);
     beam.addColorStop(0, 'rgba(124,255,178,0)');
     beam.addColorStop(1, 'rgba(124,255,178,0.25)');
     ctx.fillStyle = beam;
-    ctx.fillRect(x - 16, y - 90, 32, 120);
+    ctx.fillRect(x - 16, y - 110, 32, 140);
     ctx.restore();
+    // The door itself: a Persian arch (iwan), pointed at the top, glowing.
     ctx.save();
     ctx.strokeStyle = COLORS.portal;
     ctx.lineWidth = 4;
     ctx.shadowColor = COLORS.portal;
     ctx.shadowBlur = 22;
-    ctx.beginPath();
-    ctx.arc(x, y, GOAL_RADIUS, 0, Math.PI * 2);
+    archPath(ctx, x, y, 26, 72);
     ctx.stroke();
     ctx.shadowBlur = 0;
     ctx.strokeStyle = 'rgba(124,255,178,0.6)';
     ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(x, y, GOAL_RADIUS - 9, time * 1.5, time * 1.5 + Math.PI * 1.4);
+    archPath(ctx, x, y, 18, 58);
     ctx.stroke();
     ctx.fillStyle = COLORS.portal;
     ctx.font = `800 13px ${FONT}`;
     ctx.textAlign = 'center';
-    ctx.fillText('HOME', x, y - GOAL_RADIUS - 10);
+    ctx.fillText('DAWN DOOR', Math.min(x, STAGE_W - 50), y - 82);
     ctx.restore();
   }
 
   function drawBlots(blots, time, ember) {
     for (const b of blots) {
-      const rimColor = b.maw ? '#c026d3' : COLORS.blot;
+      // The Witch in her fair shape: a star with a violet halo, for the keen-eyed.
+      if (b.disguised) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        const halo = 0.35 + 0.2 * Math.sin(time * 2.4 + b.x * 1.3);
+        ctx.globalAlpha = halo;
+        ctx.strokeStyle = '#c084fc';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 24 + 3 * Math.sin(time * 2.4 + b.x * 1.3), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.shadowColor = COLORS.star;
+        ctx.shadowBlur = 26;
+        ctx.fillStyle = COLORS.star;
+        drawStar(ctx, b.x, b.y, 16, time * 0.6);
+        ctx.fill();
+        ctx.restore();
+        continue;
+      }
+      const rimColor = b.pale ? '#f0edff' : (b.tint ?? (b.maw ? '#c026d3' : COLORS.blot));
+      const coreColor = b.pale ? '#e6e1f5' : COLORS.blotCore;
       const es = b.radius / 16;
       // A wisp tail: smoke trailing behind the blot's motion, so a shadow
       // reads as something alive and moving, not a still blob.
@@ -331,9 +399,9 @@ export function createRenderer(canvas) {
       ctx.restore();
       ctx.save();
       if (b.sleeping) ctx.globalAlpha = 0.75;
-      // The Maw wears horns.
+      // The White Div wears horns.
       if (b.maw) {
-        ctx.fillStyle = COLORS.blotCore;
+        ctx.fillStyle = coreColor;
         ctx.strokeStyle = rimColor;
         ctx.lineWidth = 2;
         for (const side of [-1, 1]) {
@@ -346,7 +414,7 @@ export function createRenderer(canvas) {
           ctx.stroke();
         }
       }
-      ctx.fillStyle = COLORS.blotCore;
+      ctx.fillStyle = coreColor;
       ctx.strokeStyle = rimColor;
       ctx.lineWidth = 2;
       ctx.beginPath();
@@ -386,7 +454,7 @@ export function createRenderer(canvas) {
         ctx.arc(b.x + 5 * es + lookX * 1.5 * es, b.y - 2 + lookY * 1.5 * es, 2.6 * es, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur = 0;
-        // The Maw's mouth: a jagged grin that shows once it hunts.
+        // The White Div's mouth: a jagged grin that shows once it hunts.
         if (b.maw) {
           const mw = 12 * es;
           const my = b.y + 10 * es;
@@ -421,6 +489,24 @@ export function createRenderer(canvas) {
     ctx.restore();
   }
 
+  // Olad shows the way: dashed gold lines, marching like footprints, mark
+  // the ramps to draw. They are a hint only — Ember cannot roll on them.
+  function drawGuide(guide, time) {
+    if (!guide) return;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 215, 106, 0.55)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 8]);
+    ctx.lineDashOffset = -time * 24;
+    for (const g of guide) {
+      ctx.beginPath();
+      ctx.moveTo(g.x1, g.y1);
+      ctx.lineTo(g.x2, g.y2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   function drawHud(world) {
     const level = currentLevel(world);
     ctx.save();
@@ -436,7 +522,7 @@ export function createRenderer(canvas) {
     ctx.textAlign = 'center';
     ctx.fillStyle = COLORS.text;
     ctx.font = `800 19px ${FONT}`;
-    ctx.fillText(`PAGE ${world.levelIndex + 1}/${levelCount()} — ${level.name}`, STAGE_W / 2, 16);
+    ctx.fillText(`KHAN ${level.khan} OF VII — ${level.name}`, STAGE_W / 2, 16);
     ctx.fillStyle = COLORS.dim;
     ctx.font = `600 12px ${FONT}`;
     ctx.fillText(`${world.levelStars}/${level.stars.length} STARS`, STAGE_W / 2, 42);
@@ -490,15 +576,17 @@ export function createRenderer(canvas) {
       STAGE_W / 2,
       STAGE_H - 14,
     );
-    // The story, told as the game goes: the page's beat at its start, and the
-    // funny line of each star Ember picks up. Both fade out on their own.
+    // The story, told as the game goes: the page's verse from the Shahnameh
+    // at its start (one or two lines), and the funny line of each star
+    // Ember picks up. Both fade out on their own.
     if (world.screen === SCREEN_PLAY && world.pageStory) {
       const a = world.pageStory.t < 3 ? 1 : Math.max(0, 1 - (world.pageStory.t - 3));
+      const lines = world.pageStory.text.split('\n');
       ctx.globalAlpha = a;
       ctx.fillStyle = COLORS.gold;
       ctx.font = `italic 600 15px ${FONT}`;
       ctx.textAlign = 'center';
-      ctx.fillText(world.pageStory.text, STAGE_W / 2, 64);
+      lines.forEach((line, i) => ctx.fillText(line, STAGE_W / 2, 64 + i * 20));
       ctx.globalAlpha = 1;
     }
     if (world.screen === SCREEN_PLAY && world.starLine) {
@@ -507,7 +595,7 @@ export function createRenderer(canvas) {
       ctx.fillStyle = COLORS.star;
       ctx.font = `700 16px ${FONT}`;
       ctx.textAlign = 'center';
-      ctx.fillText(world.starLine.text, STAGE_W / 2, 90);
+      ctx.fillText(world.starLine.text, STAGE_W / 2, 106);
       ctx.globalAlpha = 1;
     }
     ctx.restore();
@@ -533,10 +621,13 @@ export function createRenderer(canvas) {
     ctx.fillStyle = COLORS.gold;
     ctx.font = `600 21px ${FONT}`;
     ctx.fillText('Draw the way home.', STAGE_W / 2, 210);
-    ctx.fillStyle = COLORS.text;
-    ctx.font = `500 17px ${FONT}`;
-    ctx.fillText('The Paper Sky went dark. Ember, the last little light, must cross eleven', STAGE_W / 2, 258);
-    ctx.fillText('pages of night to reach the Dawn Door — but ink runs out, and shadows eat it.', STAGE_W / 2, 284);
+    ctx.fillStyle = COLORS.gold;
+    ctx.font = `italic 600 17px ${FONT}`;
+    ctx.fillText('“Then Rustam, that world-brightening paladin,', STAGE_W / 2, 258);
+    ctx.fillText('Departed from his sire and, treating night like day…”', STAGE_W / 2, 284);
+    ctx.fillStyle = COLORS.dim;
+    ctx.font = `600 12px ${FONT}`;
+    ctx.fillText('— Ferdowsi, Shahnameh · The Seven Courses of Rustam (Warner translation, 1906)', STAGE_W / 2, 308);
     ctx.fillStyle = COLORS.dim;
     ctx.font = `600 15px ${FONT}`;
     ctx.fillText(
@@ -575,7 +666,7 @@ export function createRenderer(canvas) {
     ctx.textAlign = 'center';
     ctx.fillStyle = COLORS.portal;
     ctx.font = `800 40px ${FONT}`;
-    ctx.fillText('PAGE CLEAR!', STAGE_W / 2, 130);
+    ctx.fillText('KHAN CLEAR!', STAGE_W / 2, 130);
     // Stars earned, filled or dim.
     for (let i = 0; i < info.starsTotal; i += 1) {
       const x = STAGE_W / 2 + (i - (info.starsTotal - 1) / 2) * 64;
@@ -597,7 +688,7 @@ export function createRenderer(canvas) {
     ctx.fillText(`+${info.bonus.toLocaleString('en-US')}   —   SCORE ${world.score.toLocaleString('en-US')}`, STAGE_W / 2, 322);
     ctx.fillStyle = COLORS.ink;
     ctx.font = `800 21px ${FONT}`;
-    ctx.fillText('CLICK OR PRESS ENTER FOR THE NEXT PAGE', STAGE_W / 2, 398);
+    ctx.fillText('CLICK OR PRESS ENTER FOR THE NEXT KHAN', STAGE_W / 2, 398);
     ctx.restore();
   }
 
@@ -626,10 +717,10 @@ export function createRenderer(canvas) {
     ctx.fillText(world.score.toLocaleString('en-US'), STAGE_W / 2, 220);
     ctx.fillStyle = COLORS.dim;
     ctx.font = `600 17px ${FONT}`;
-    ctx.fillText(`BEST ${world.best.toLocaleString('en-US')}      PAGE ${world.levelIndex + 1}/${levelCount()}`, STAGE_W / 2, 280);
+    ctx.fillText(`BEST ${world.best.toLocaleString('en-US')}      KHAN ${currentLevel(world).khan}`, STAGE_W / 2, 280);
     ctx.fillStyle = COLORS.text;
     ctx.font = `500 16px ${FONT}`;
-    ctx.fillText('The dark wins this page. But Ember always gets back up.', STAGE_W / 2, 316);
+    ctx.fillText('“When I am wroth all foes are one to me.”', STAGE_W / 2, 316);
     ctx.fillStyle = COLORS.ink;
     ctx.font = `800 21px ${FONT}`;
     ctx.fillText('PRESS R OR CLICK TO TRY AGAIN', STAGE_W / 2, 360);
@@ -656,10 +747,10 @@ export function createRenderer(canvas) {
     ctx.fillText(`BEST ${world.best.toLocaleString('en-US')}      ${world.starsTotal} STARS COLLECTED`, STAGE_W / 2, 292);
     ctx.fillStyle = COLORS.text;
     ctx.font = `500 17px ${FONT}`;
-    ctx.fillText('The Dawn Door opens, and the Paper Sky lights up again.', STAGE_W / 2, 336);
+    ctx.fillText('“The chief of ardent spirit hath returned!”', STAGE_W / 2, 336);
     ctx.fillStyle = COLORS.dim;
     ctx.font = `500 15px ${FONT}`;
-    ctx.fillText('The shadows went back to sleep. Probably.', STAGE_W / 2, 364);
+    ctx.fillText('Rejoice, thy foe is slain.', STAGE_W / 2, 364);
     ctx.fillStyle = COLORS.ink;
     ctx.font = `800 21px ${FONT}`;
     ctx.fillText('PRESS R OR CLICK TO PLAY AGAIN', STAGE_W / 2, 400);
@@ -678,6 +769,7 @@ export function createRenderer(canvas) {
       drawFireflies(world.time);
       const level = currentLevel(world);
       drawPlatforms(level);
+      drawGuide(level.guide, world.time);
       drawPortal(world.goal, world.time);
       drawStars(world.stars, world.time);
       drawInk(world.ink.segments);
