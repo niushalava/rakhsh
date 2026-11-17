@@ -19,8 +19,10 @@ export const AIR_CONTROL = 0.35; // the roll steers this much in the air
 export const RESTITUTION = 0.12; // a soft bounce off surfaces
 export const FALL_Y = 640; // below this, Ember is lost and a life is spent
 
-// Ink: the resource drawing spends. Cost is per pixel of line.
+// Ink: the resource drawing spends. Cost is per pixel of line. Gold ink costs
+// half as much again, but the blots cannot eat it — press G to switch.
 export const INK_COST_PER_PX = 0.3;
+export const GOLD_COST_MULT = 1.5;
 export const INK_REGEN = 7; // ink per second, always trickling back
 export const INK_STAR_BONUS = 25; // a star refills this much ink
 export const DRAW_SPACING = 14; // px between polyline points while drawing
@@ -45,6 +47,8 @@ export const COLORS = {
   platformTop: '#6b6390',
   ink: '#6ef3ff',
   inkCore: '#e8feff',
+  goldInk: '#ffd76a',
+  goldInkCore: '#fff8dc',
   ember: '#ffb347',
   emberCore: '#fff3c4',
   blot: '#8b5cf6',

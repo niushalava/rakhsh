@@ -31,6 +31,7 @@ import {
   ACTION_DRAW_START,
   ACTION_ERASE_END,
   ACTION_ERASE_START,
+  ACTION_GOLD,
   ACTION_PAUSE,
   ACTION_RESTART,
 } from './input.js';
@@ -219,6 +220,12 @@ export function updateWorld(world, input, actions, path, dt, events) {
     restartLevel(world);
     events.push({ type: 'click' });
     return;
+  }
+  // G switches between plain ink and gold ink (half as much again, the blots
+  // cannot eat it).
+  if (actions.has(ACTION_GOLD)) {
+    world.ink.gold = !world.ink.gold;
+    events.push({ type: 'gold', on: world.ink.gold, x: input.pointer.x, y: input.pointer.y });
   }
 
   // Drawing and erasing follow the pointer's queued path.

@@ -8,6 +8,7 @@ export const ACTION_CONFIRM = 'confirm';
 export const ACTION_PAUSE = 'pause';
 export const ACTION_RESTART = 'restart';
 export const ACTION_MUTE = 'mute';
+export const ACTION_GOLD = 'gold';
 export const ACTION_DRAW_START = 'drawStart';
 export const ACTION_DRAW_END = 'drawEnd';
 export const ACTION_ERASE_START = 'eraseStart';
@@ -17,6 +18,7 @@ const CONFIRM_KEYS = new Set(['Enter', ' ']);
 const PAUSE_KEYS = new Set(['p', 'P', 'Escape']);
 const RESTART_KEYS = new Set(['r', 'R']);
 const MUTE_KEYS = new Set(['m', 'M']);
+const GOLD_KEYS = new Set(['g', 'G']);
 
 export function createInput(canvas) {
   const queued = new Set();
@@ -68,6 +70,7 @@ export function createInput(canvas) {
     if (PAUSE_KEYS.has(event.key)) queued.add(ACTION_PAUSE);
     if (RESTART_KEYS.has(event.key)) queued.add(ACTION_RESTART);
     if (MUTE_KEYS.has(event.key)) queued.add(ACTION_MUTE);
+    if (GOLD_KEYS.has(event.key)) queued.add(ACTION_GOLD);
     if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
       event.preventDefault();
     }

@@ -4,12 +4,13 @@
 
 import { SCREEN_CLEAR, SCREEN_PLAY, SCREEN_TITLE, SCREEN_VICTORY, loadLevel } from './world.js';
 
-function addLine(world, x1, y1, x2, y2) {
+function addLine(world, x1, y1, x2, y2, gold = false) {
   world.ink.segments.push({
     x1, y1, x2, y2,
-    cost: Math.hypot(x2 - x1, y2 - y1) * 0.3,
+    cost: Math.hypot(x2 - x1, y2 - y1) * 0.3 * (gold ? 1.5 : 1),
     eaten: 0,
     stroke: 1,
+    gold,
   });
 }
 
@@ -26,7 +27,8 @@ export function stageShot(name, world) {
 
   if (name === 'play') {
     // Mid-level on page 7 (Twin Blots): a ramp up to the middle step, Ember
-    // rolling across it, a blot threatening the ramp, stars above.
+    // rolling across it, a blot threatening the ramp, stars above — and a
+    // gold line patching the step's far edge, where the second blot waits.
     loadLevel(world, 6);
     world.screen = SCREEN_PLAY;
     world.score = 2340;
@@ -39,6 +41,7 @@ export function stageShot(name, world) {
     world.ember.vx = 120;
     if (world.stars[0]) world.stars[0].taken = true;
     addLine(world, 200, 520, 300, 450);
+    addLine(world, 520, 450, 542, 520, true);
     return;
   }
 
@@ -54,7 +57,7 @@ export function stageShot(name, world) {
   }
 
   if (name === 'victory') {
-    loadLevel(world, 7);
+    loadLevel(world, 9);
     world.screen = SCREEN_VICTORY;
     world.score = 5240;
     world.best = 5240;

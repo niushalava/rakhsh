@@ -47,7 +47,7 @@ export const LEVELS = [
     name: 'Blot Alley',
     start: { x: 80, y: 470 },
     goal: { x: 880, y: 494 },
-    ink: 110,
+    ink: 130,
     platforms: [
       { x1: 0, y1: 520, x2: 380, y2: 520 },
       { x1: 580, y1: 520, x2: 960, y2: 520 },
@@ -94,6 +94,35 @@ export const LEVELS = [
       { x: 290, y: 470, axis: 'x', range: 26, speed: 38 },
       { x: 530, y: 470, axis: 'x', range: 26, speed: 38 },
     ],
+  },
+  {
+    name: 'The Tower',
+    start: { x: 80, y: 470 },
+    goal: { x: 900, y: 254 },
+    ink: 180,
+    platforms: [
+      { x1: 0, y1: 520, x2: 200, y2: 520 },
+      { x1: 240, y1: 440, x2: 400, y2: 440 },
+      { x1: 440, y1: 360, x2: 600, y2: 360 },
+      { x1: 640, y1: 280, x2: 800, y2: 280 },
+      { x1: 840, y1: 280, x2: 960, y2: 280 },
+    ],
+    stars: [{ x: 220, y: 450 }, { x: 420, y: 370 }, { x: 620, y: 290 }],
+    // No blot here: the climb itself is the puzzle, and a blot on a ramp
+    // would eat the road out from under Ember mid-climb.
+    blots: [],
+  },
+  {
+    name: 'The Chase',
+    start: { x: 80, y: 470 },
+    goal: { x: 890, y: 494 },
+    ink: 170,
+    platforms: [
+      { x1: 0, y1: 520, x2: 300, y2: 520 },
+      { x1: 660, y1: 520, x2: 960, y2: 520 },
+    ],
+    stars: [{ x: 380, y: 430 }, { x: 480, y: 380 }, { x: 580, y: 430 }],
+    blots: [{ x: 480, y: 505, axis: 'x', range: 120, speed: 50 }],
   },
   {
     name: 'Homecoming',

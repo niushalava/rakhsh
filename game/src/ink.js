@@ -7,6 +7,7 @@ import {
   BLOT_EAT_TIME,
   DRAW_SPACING,
   ERASE_REFUND,
+  GOLD_COST_MULT,
   INK_COST_PER_PX,
   INK_REGEN,
 } from './config.js';
@@ -17,13 +18,14 @@ export function createInkStore(maxInk) {
     current: null,
     ink: maxInk,
     maxInk,
+    gold: false,
     nextStroke: 1,
   };
 }
 
 export function beginStroke(store, x, y) {
   if (store.ink <= 0) return;
-  store.current = { id: store.nextStroke, points: [{ x, y }] };
+  store.current = { id: store.nextStroke, gold: store.gold, points: [{ x, y }] };
   store.nextStroke += 1;
 }
 
@@ -42,7 +44,7 @@ export function extendStroke(store, x, y) {
     const step = DRAW_SPACING / dist;
     const nx = last.x + dx * step;
     const ny = last.y + dy * step;
-    const cost = DRAW_SPACING * INK_COST_PER_PX;
+    const cost = DRAW_SPACING * INK_COST_PER_PX * (stroke.gold ? GOLD_COST_MULT : 1);
     if (store.ink < cost) {
       store.ink = 0;
       store.current = null;
@@ -51,7 +53,7 @@ export function extendStroke(store, x, y) {
     store.ink -= cost;
     store.segments.push({
       x1: last.x, y1: last.y, x2: nx, y2: ny,
-      cost, eaten: 0, stroke: stroke.id,
+      cost, eaten: 0, stroke: stroke.id, gold: stroke.gold,
     });
     stroke.points.push({ x: nx, y: ny });
     added += 1;
@@ -96,10 +98,11 @@ export function eraseAt(store, x, y, radius = 20) {
 }
 
 // A blot resting on segments eats them, one after BLOT_EAT_TIME of contact.
-// Returns the eaten segments (for particles).
+// Gold ink cannot be eaten. Returns the eaten segments (for particles).
 export function blotEat(store, blot, dt) {
   const eaten = [];
   for (const seg of store.segments) {
+    if (seg.gold) continue;
     if (pointSegmentDistance(blot.x, blot.y, seg) < blot.radius + 2) {
       seg.eaten += dt;
     } else {

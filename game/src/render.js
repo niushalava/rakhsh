@@ -103,6 +103,33 @@ export function createRenderer(canvas) {
   for (let i = 0; i < 500; i += 1) {
     bctx.fillRect(rng.range(0, STAGE_W), rng.range(0, STAGE_H), 1.5, 1.5);
   }
+  // Brighter stars, mostly in the upper sky.
+  for (let i = 0; i < 70; i += 1) {
+    const sx = rng.range(0, STAGE_W);
+    const sy = rng.range(0, STAGE_H * 0.62);
+    const sr = rng.range(0.6, 1.8);
+    bctx.fillStyle = `rgba(255,255,255,${rng.range(0.15, 0.6).toFixed(2)})`;
+    bctx.beginPath();
+    bctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    bctx.fill();
+  }
+  // A pale moon with a halo, upper right.
+  const moonX = 830;
+  const moonY = 105;
+  const halo = bctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 130);
+  halo.addColorStop(0, 'rgba(220, 230, 255, 0.28)');
+  halo.addColorStop(1, 'rgba(220, 230, 255, 0)');
+  bctx.fillStyle = halo;
+  bctx.fillRect(moonX - 130, moonY - 130, 260, 260);
+  bctx.fillStyle = 'rgba(235, 240, 255, 0.9)';
+  bctx.beginPath();
+  bctx.arc(moonX, moonY, 26, 0, Math.PI * 2);
+  bctx.fill();
+  bctx.fillStyle = 'rgba(200, 210, 235, 0.5)';
+  bctx.beginPath();
+  bctx.arc(moonX - 8, moonY - 4, 6, 0, Math.PI * 2);
+  bctx.arc(moonX + 9, moonY + 8, 4, 0, Math.PI * 2);
+  bctx.fill();
   const splats = [
     { x: 150, y: 120, r: 130, c: 'rgba(60, 40, 120, 0.35)' },
     { x: 820, y: 480, r: 170, c: 'rgba(20, 70, 110, 0.3)' },
@@ -123,6 +150,37 @@ export function createRenderer(canvas) {
     bctx.moveTo(0, y);
     bctx.lineTo(STAGE_W, y);
     bctx.stroke();
+  }
+
+  // Fireflies: drifting motes of warm light, seeded so a screenshot is the
+  // same twice. Their positions are a function of time, never of frame order.
+  const fireflies = [];
+  const frng = createRandom(777);
+  for (let i = 0; i < 36; i += 1) {
+    fireflies.push({
+      x: frng.range(0, STAGE_W),
+      y: frng.range(60, STAGE_H - 80),
+      r: frng.range(14, 42),
+      speed: frng.range(0.1, 0.35),
+      phase: frng.range(0, Math.PI * 2),
+      size: frng.range(1.2, 2.6),
+    });
+  }
+
+  function drawFireflies(time) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (const f of fireflies) {
+      const x = f.x + Math.sin(time * f.speed + f.phase) * f.r;
+      const y = f.y + Math.cos(time * f.speed * 0.8 + f.phase * 1.7) * f.r * 0.6;
+      const twinkle = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(time * 1.4 + f.phase * 3));
+      ctx.globalAlpha = twinkle * 0.8;
+      ctx.fillStyle = '#ffe9a3';
+      ctx.beginPath();
+      ctx.arc(x, y, f.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
   }
 
   function drawPlatforms(level) {
@@ -153,7 +211,7 @@ export function createRenderer(canvas) {
     for (const seg of segments) {
       const fade = seg.eaten > 0 ? 1 - (seg.eaten / BLOT_EAT_TIME) * 0.65 : 1;
       ctx.globalAlpha = fade;
-      ctx.strokeStyle = COLORS.ink;
+      ctx.strokeStyle = seg.gold ? COLORS.goldInk : COLORS.ink;
       ctx.lineWidth = 6;
       ctx.beginPath();
       ctx.moveTo(seg.x1, seg.y1);
@@ -163,7 +221,7 @@ export function createRenderer(canvas) {
     for (const seg of segments) {
       const fade = seg.eaten > 0 ? 1 - (seg.eaten / BLOT_EAT_TIME) * 0.65 : 1;
       ctx.globalAlpha = fade;
-      ctx.strokeStyle = COLORS.inkCore;
+      ctx.strokeStyle = seg.gold ? COLORS.goldInkCore : COLORS.inkCore;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(seg.x1, seg.y1);
@@ -306,18 +364,22 @@ export function createRenderer(canvas) {
     ctx.fillStyle = 'rgba(255,255,255,0.10)';
     roundRect(ctx, bx, by, bw, 12, 6);
     ctx.fill();
-    ctx.fillStyle = low ? COLORS.danger : COLORS.ink;
+    ctx.fillStyle = low ? COLORS.danger : (world.ink.gold ? COLORS.goldInk : COLORS.ink);
     if (frac > 0) {
       roundRect(ctx, bx, by, bw * frac, 12, 6);
       ctx.fill();
     }
-    ctx.fillStyle = low ? COLORS.danger : COLORS.ink;
+    ctx.fillStyle = low ? COLORS.danger : (world.ink.gold ? COLORS.goldInk : COLORS.ink);
     ctx.font = `700 12px ${FONT}`;
     ctx.textAlign = 'center';
-    ctx.fillText(low ? 'INK LOW — WAIT FOR IT TO REFILL' : 'INK', STAGE_W / 2, by - 20);
+    ctx.fillText(
+      low ? 'INK LOW — WAIT FOR IT TO REFILL' : (world.ink.gold ? 'GOLD INK — 50% MORE, BLOTS CAN\'T EAT IT' : 'INK'),
+      STAGE_W / 2,
+      by - 20,
+    );
     ctx.fillStyle = COLORS.dim;
     ctx.font = `600 11px ${FONT}`;
-    ctx.fillText('DRAW with the mouse · RIGHT-DRAG erases · R restarts the page', STAGE_W / 2, STAGE_H - 14);
+    ctx.fillText('DRAW with the mouse · RIGHT-DRAG erases · G gold ink · R restarts the page', STAGE_W / 2, STAGE_H - 14);
     ctx.restore();
   }
 
@@ -344,10 +406,12 @@ export function createRenderer(canvas) {
     ctx.fillStyle = COLORS.text;
     ctx.font = `500 17px ${FONT}`;
     ctx.fillText('Ember is lost in the dark. Draw bridges of ink to guide the little light home —', STAGE_W / 2, 258);
-    ctx.fillText('but ink runs out, and the shadows eat it. Eight pages. Three lives.', STAGE_W / 2, 284);
+    ctx.fillText('but ink runs out, and the shadows eat it. Ten pages. Three lives.', STAGE_W / 2, 284);
     ctx.fillStyle = COLORS.dim;
     ctx.font = `600 15px ${FONT}`;
-    ctx.fillText('MOUSE — draw ink      RIGHT-DRAG — erase      R — restart page      P — pause      M — mute', STAGE_W / 2, 344);
+    ctx.fillText('MOUSE — draw ink      RIGHT-DRAG — erase      R — restart page      P — pause      M — mute', STAGE_W / 2, 340);
+    ctx.fillStyle = COLORS.goldInk;
+    ctx.fillText('G — gold ink: costs 50% more, the shadows can\'t eat it', STAGE_W / 2, 366);
     const pulse = 0.65 + 0.35 * Math.sin(time * 3.2);
     ctx.globalAlpha = pulse;
     ctx.fillStyle = COLORS.ink;
@@ -463,6 +527,7 @@ export function createRenderer(canvas) {
         ctx.translate((Math.random() - 0.5) * world.shake, (Math.random() - 0.5) * world.shake);
       }
       ctx.drawImage(bg, 0, 0);
+      drawFireflies(world.time);
       const level = currentLevel(world);
       drawPlatforms(level);
       drawPortal(world.goal, world.time);

@@ -31,9 +31,9 @@ export function createParticles() {
         y: y + (Math.random() - 0.5) * 6,
         vx: (Math.random() - 0.5) * 20,
         vy: (Math.random() - 0.5) * 20,
-        life: 0.35,
-        maxLife: 0.35,
-        size: 2.5 + Math.random() * 2,
+        life: 0.5,
+        maxLife: 0.5,
+        size: 3 + Math.random() * 3,
         color,
       });
     },

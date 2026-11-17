@@ -90,6 +90,11 @@ export function createAudio() {
     click() {
       tone({ freq: 660, dur: 0.07, vol: 0.18, type: 'triangle' });
     },
+    // Switching to gold ink: a bright two-note chime.
+    gold() {
+      tone({ freq: 880, dur: 0.1, vol: 0.16, type: 'triangle' });
+      tone({ freq: 1318, dur: 0.14, vol: 0.14, type: 'triangle', at: 0.07 });
+    },
     // The pencil: a soft tick as the line grows.
     drawTick() {
       noise({ dur: 0.05, vol: 0.06, from: 5000, to: 3500 });

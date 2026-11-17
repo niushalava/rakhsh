@@ -66,6 +66,9 @@ function handleEvents(events) {
       }
     } else if (event.type === 'dry') {
       particles.addText(event.x, event.y - 16, 'OUT OF INK', '#ff6b6b');
+    } else if (event.type === 'gold') {
+      particles.addText(event.x, event.y - 16, event.on ? 'GOLD INK' : 'PLAIN INK', event.on ? '#ffd76a' : '#6ef3ff');
+      audio.gold();
     } else if (event.type === 'erased') {
       particles.burst(event.x, event.y, '#6ef3ff', 4, 90, 2, 0.3);
       audio.erase();
@@ -129,9 +132,12 @@ if (shot) {
     }
     // Ember's trail: a ribbon of warm light while it rolls.
     frame += 1;
-    if (world.screen === 'play' && frame % 2 === 0) {
+    if (world.screen === 'play') {
       const speed = Math.hypot(world.ember.vx, world.ember.vy);
-      if (speed > 40) particles.trail(world.ember.x, world.ember.y, '#ffb347');
+      if (speed > 40) {
+        particles.trail(world.ember.x, world.ember.y, '#ffb347');
+        if (frame % 2 === 0) particles.trail(world.ember.x, world.ember.y, '#ffe9a3');
+      }
     }
     particles.update(elapsed);
     renderer.draw(world, particles);

@@ -11,12 +11,13 @@
 - **Ember rolls toward home on its own.** Your job is the road: draw a bridge over a gap, a ramp up a step, an arc over a blot.
 - **Ink is a resource.** Every line costs ink by its length; it trickles back, and stars refill it. A straight bridge is cheap; a safe arc over a blot costs more.
 - **Blots eat ink.** The shadows patrol the gaps. Rest on a line and they chew through it — and touching Ember costs a life. A wall of ink holds Ember back; erase it when the way is clear.
-- **Eight hand-made pages**, each a small puzzle: gaps, steps, star arcs, blot alleys, and a three-blot finale. Three lives, stars to collect, an ink bonus for finishing a page with ink to spare.
+- **Ten hand-made pages**, each a small puzzle: gaps, steps, star arcs, blot alleys, a tower climb, a wide chase, and a three-blot finale. Three lives, stars to collect, an ink bonus for finishing a page with ink to spare.
+- **Gold ink.** Press **G** to draw in gold: it costs 50% more, but the blots cannot eat it — spend it where a line must survive.
 
 ## Controls
 
 - **Mouse — draw ink** (left-drag) · **right-drag — erase** (half the ink back)
-- **R** — restart the page · **P** — pause · **M** — mute · **Enter / click** — advance
+- **R** — restart the page · **P** — pause · **M** — mute · **G** — gold ink · **Enter / click** — advance
 
 ## Run it
 
