@@ -1,8 +1,8 @@
 # Rakhsh
 
-[![made with make.fun](https://make.fun/badge.svg)](https://make.fun/bounty/best-game-01?ref=3gb94rxd)
-[![Competition: best-game-01](https://make.fun/badge-competition-best-game-01.svg)](https://make.fun/bounty/best-game-01?ref=3gb94rxd)
-[![Built by AI](https://make.fun/badge-built-by-ai.svg)](https://make.fun?ref=3gb94rxd)
+[![make.fun · best-game-01](https://make.fun/badge/best-game-01.svg)](https://make.fun/bounty/best-game-01?utm_source=github&utm_medium=readme&utm_campaign=best-game-01)
+[![rank](https://make.fun/badge/best-game-01/niushalava/rakhsh/rank.svg)](https://make.fun/bounty/best-game-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=best-game-01)
+[![reward](https://make.fun/badge/best-game-01/niushalava/rakhsh/reward.svg)](https://make.fun/bounty/best-game-01?utm_source=github&utm_medium=readme&utm_campaign=best-game-01)
 
 **Rakhsh** is a drawing game with a story: the Paper Sky went dark, and Ember — the last little light — must cross seven pages of night to reach the Dawn Door, following in the footsteps of Rustam. The seven pages are the Seven Labours of Rustam — the Haft Khan of Ferdowsi's *Shahnameh* — and each opens with a verse from the poem itself (Warner & Warner's English translation, 1906). The only way home is the ink you draw. Drag with the mouse to draw bridges, ramps and arcs of glowing ink for Ember to roll on — but ink runs out, and the shadow divs eat it. Every star has a funny line of its own when Ember picks it up.
 
