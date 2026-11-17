@@ -26,22 +26,28 @@ export function stageShot(name, world) {
   }
 
   if (name === 'play') {
-    // Mid-level on page 7 (Twin Blots): a ramp up to the middle step, Ember
-    // rolling across it, a blot threatening the ramp, stars above — and a
-    // gold line patching the step's far edge, where the second blot waits.
-    loadLevel(world, 6);
+    // Mid-chase on the final page (The Long Night): Ember fleeing across the
+    // islands, the Maw awake behind it, three bridges drawn and the last gap
+    // still open ahead.
+    loadLevel(world, 10);
     world.screen = SCREEN_PLAY;
-    world.score = 2340;
-    world.best = 3420;
-    world.lives = 3;
+    world.score = 5100;
+    world.best = 6106;
+    world.lives = 2;
     world.levelStars = 1;
-    world.ink.ink = 62;
-    world.ember.x = 410;
-    world.ember.y = 436;
-    world.ember.vx = 120;
+    world.ink.ink = 90;
+    world.ember.x = 760;
+    world.ember.y = 505;
+    world.ember.vx = 130;
     if (world.stars[0]) world.stars[0].taken = true;
-    addLine(world, 200, 520, 300, 450);
-    addLine(world, 520, 450, 542, 520, true);
+    addLine(world, 200, 520, 320, 520);
+    addLine(world, 400, 520, 520, 520);
+    addLine(world, 600, 520, 720, 520);
+    if (world.blots[0]) {
+      world.blots[0].x = 560;
+      world.blots[0].y = 475;
+      world.blots[0].sleeping = false;
+    }
     return;
   }
 
@@ -57,16 +63,21 @@ export function stageShot(name, world) {
   }
 
   if (name === 'victory') {
-    loadLevel(world, 9);
+    loadLevel(world, 10);
     world.screen = SCREEN_VICTORY;
-    world.score = 5240;
-    world.best = 5240;
+    world.score = 6240;
+    world.best = 6240;
     world.newBest = true;
-    world.starsTotal = 14;
-    world.blots = [];
+    world.starsTotal = 16;
+    // The Maw, left behind in the dark.
+    if (world.blots[0]) {
+      world.blots[0].x = 320;
+      world.blots[0].y = 470;
+      world.blots[0].sleeping = false;
+    }
     for (const s of world.stars) s.taken = true;
-    world.ember.x = 860;
-    world.ember.y = 340;
+    world.ember.x = 890;
+    world.ember.y = 505;
     return;
   }
 }

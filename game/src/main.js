@@ -11,12 +11,13 @@ import { createRandom } from './random.js';
 import { createAudio } from './audio.js';
 import { createParticles } from './particles.js';
 import { ACTION_MUTE, createInput } from './input.js';
-import { createWorld, updateWorld } from './world.js';
+import { createWorld, loadLevel, updateWorld } from './world.js';
 import { createRenderer } from './render.js';
 import { stageShot } from './shots.js';
 
 const params = new URLSearchParams(window.location.search);
 const shot = params.get('shot');
+const levelParam = Number.parseInt(params.get('level') ?? '', 10);
 const seedParam = Number.parseInt(params.get('seed') ?? '', 10);
 const seed = Number.isInteger(seedParam) ? seedParam : Math.floor(Math.random() * 4294967296);
 
@@ -112,6 +113,11 @@ function runShot(name) {
 if (shot) {
   runShot(shot);
 } else {
+  // ?level=N jumps straight to that page for testing (1-based).
+  if (Number.isInteger(levelParam) && levelParam >= 1) {
+    loadLevel(world, levelParam - 1);
+    world.screen = 'play';
+  }
   let last = performance.now();
   let acc = 0;
   let frame = 0;

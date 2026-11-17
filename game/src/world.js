@@ -24,7 +24,7 @@ import {
   extendStroke,
   regenerateInk,
 } from './ink.js';
-import { createBlot, updateBlot } from './blots.js';
+import { createBlot, resetBlot, updateBlot } from './blots.js';
 import {
   ACTION_CONFIRM,
   ACTION_DRAW_END,
@@ -65,6 +65,7 @@ export function createWorld(random) {
     clearInfo: null,
     shake: 0,
     time: 0,
+    levelTime: 0,
     dryNotified: false,
   };
   try {
@@ -91,6 +92,7 @@ export function loadLevel(world, index) {
   world.stars = level.stars.map((s) => ({ ...s, taken: false }));
   world.goal = { ...level.goal };
   world.clearInfo = null;
+  world.levelTime = 0;
   world.dryNotified = false;
 }
 
@@ -137,10 +139,13 @@ function loseLife(world, events, kind) {
   } else {
     events.push({ type: 'hit', x: world.ember.x, y: world.ember.y });
   }
-  // Ember returns to the page's start, briefly untouchable.
+  // Ember returns to the page's start, briefly untouchable, and the shadows
+  // return to theirs — the Maw goes back to sleep.
   const level = currentLevel(world);
   world.ember = createEmber(level.start.x, level.start.y);
   world.ember.invulnerable = HIT_INVULNERABLE;
+  for (const blot of world.blots) resetBlot(blot);
+  world.levelTime = 0;
 }
 
 function levelCleared(world, events) {
@@ -174,7 +179,7 @@ export function updateWorld(world, input, actions, path, dt, events) {
   if (world.screen === SCREEN_TITLE) {
     // Ember idles on the first page behind the title: the world is alive.
     updateEmber(world.ember, world.goal.x, dt, currentLevel(world).platforms);
-    for (const blot of world.blots) updateBlot(blot, dt);
+    for (const blot of world.blots) updateBlot(blot, dt, null, world.levelTime);
     if (actions.has(ACTION_CONFIRM)) {
       startRun(world);
       events.push({ type: 'click' });
@@ -221,6 +226,7 @@ export function updateWorld(world, input, actions, path, dt, events) {
     events.push({ type: 'click' });
     return;
   }
+  world.levelTime += dt;
   // G switches between plain ink and gold ink (half as much again, the blots
   // cannot eat it).
   if (actions.has(ACTION_GOLD)) {
@@ -252,8 +258,9 @@ export function updateWorld(world, input, actions, path, dt, events) {
   if (world.ink.ink > 5) world.dryNotified = false;
   regenerateInk(world.ink, dt);
 
-  for (const blot of world.blots) updateBlot(blot, dt);
+  for (const blot of world.blots) updateBlot(blot, dt, world.ember, world.levelTime);
   for (const blot of world.blots) {
+    if (blot.sleeping) continue; // a sleeping shadow neither eats nor hunts
     const eaten = blotEat(world.ink, blot, dt);
     for (const seg of eaten) {
       events.push({ type: 'eaten', x: (seg.x1 + seg.x2) / 2, y: (seg.y1 + seg.y2) / 2 });
@@ -285,9 +292,10 @@ export function updateWorld(world, input, actions, path, dt, events) {
     return;
   }
 
-  // Blots: a touch costs a life, unless Ember is still untouchable. Ember then
-  // returns to the page's start (loseLife respawns it).
+  // Blots: a touch costs a life, unless Ember is still untouchable or the
+  // blot is asleep. Ember then returns to the page's start (loseLife respawns it).
   for (const blot of world.blots) {
+    if (blot.sleeping) continue;
     const d = Math.hypot(blot.x - world.ember.x, blot.y - world.ember.y);
     if (d < blot.radius + world.ember.radius && world.ember.invulnerable <= 0) {
       loseLife(world, events, 'hit');

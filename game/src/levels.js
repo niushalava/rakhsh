@@ -142,6 +142,25 @@ export const LEVELS = [
       { x: 740, y: 345, axis: 'x', range: 30, speed: 48 },
     ],
   },
+  {
+    name: 'The Long Night',
+    start: { x: 80, y: 470 },
+    goal: { x: 920, y: 494 },
+    ink: 200,
+    platforms: [
+      { x1: 0, y1: 520, x2: 220, y2: 520 },
+      { x1: 300, y1: 520, x2: 420, y2: 520 },
+      { x1: 500, y1: 520, x2: 620, y2: 520 },
+      { x1: 700, y1: 520, x2: 820, y2: 520 },
+      { x1: 880, y1: 520, x2: 960, y2: 520 },
+    ],
+    stars: [{ x: 260, y: 440 }, { x: 460, y: 440 }, { x: 660, y: 440 }],
+    // The Maw: a giant shadow that sleeps 2.5 seconds (time to draw the first
+    // bridges), then hunts Ember at 112 px/s — slower than Ember's roll, so a
+    // clear road outruns it. It eats the road behind Ember; only gold ink
+    // survives it. It lurks above the start, clear of Ember, until it wakes.
+    blots: [{ x: 40, y: 400, mode: 'chase', speed: 112, radius: 30, maw: true, wake: 2.5 }],
+  },
 ];
 
 export function levelCount() {

@@ -280,20 +280,23 @@ export function createRenderer(canvas) {
 
   function drawBlots(blots, time) {
     for (const b of blots) {
+      const rimColor = b.maw ? '#c026d3' : COLORS.blot;
       ctx.save();
+      if (b.sleeping) ctx.globalAlpha = 0.7;
       ctx.globalCompositeOperation = 'lighter';
       const rim = ctx.createRadialGradient(b.x, b.y, b.radius * 0.4, b.x, b.y, b.radius * 1.8);
       rim.addColorStop(0, 'rgba(0,0,0,0)');
-      rim.addColorStop(1, COLORS.blot);
-      ctx.globalAlpha = 0.5;
+      rim.addColorStop(1, rimColor);
+      ctx.globalAlpha = b.sleeping ? 0.3 : 0.5;
       ctx.fillStyle = rim;
       ctx.beginPath();
       ctx.arc(b.x, b.y, b.radius * 1.8, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
       ctx.save();
+      if (b.sleeping) ctx.globalAlpha = 0.75;
       ctx.fillStyle = COLORS.blotCore;
-      ctx.strokeStyle = COLORS.blot;
+      ctx.strokeStyle = rimColor;
       ctx.lineWidth = 2;
       ctx.beginPath();
       const spikes = 9;
@@ -308,11 +311,29 @@ export function createRenderer(canvas) {
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
-      ctx.fillStyle = '#e8d5ff';
-      ctx.beginPath();
-      ctx.arc(b.x - 5, b.y - 2, 2.6, 0, Math.PI * 2);
-      ctx.arc(b.x + 5, b.y - 2, 2.6, 0, Math.PI * 2);
-      ctx.fill();
+      // Eyes scale with the blot; the Maw's burn red, and a sleeping blot's
+      // are shut.
+      const es = b.radius / 16;
+      if (b.sleeping) {
+        ctx.strokeStyle = '#e8d5ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(b.x - 7 * es, b.y - 2);
+        ctx.lineTo(b.x - 3 * es, b.y - 2);
+        ctx.moveTo(b.x + 3 * es, b.y - 2);
+        ctx.lineTo(b.x + 7 * es, b.y - 2);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = b.maw ? '#ff5a5a' : '#e8d5ff';
+        if (b.maw) {
+          ctx.shadowColor = '#ff5a5a';
+          ctx.shadowBlur = 10;
+        }
+        ctx.beginPath();
+        ctx.arc(b.x - 5 * es, b.y - 2, 2.6 * es, 0, Math.PI * 2);
+        ctx.arc(b.x + 5 * es, b.y - 2, 2.6 * es, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
     }
   }
@@ -406,7 +427,7 @@ export function createRenderer(canvas) {
     ctx.fillStyle = COLORS.text;
     ctx.font = `500 17px ${FONT}`;
     ctx.fillText('Ember is lost in the dark. Draw bridges of ink to guide the little light home —', STAGE_W / 2, 258);
-    ctx.fillText('but ink runs out, and the shadows eat it. Ten pages. Three lives.', STAGE_W / 2, 284);
+    ctx.fillText('but ink runs out, and the shadows eat it. Eleven pages. Three lives.', STAGE_W / 2, 284);
     ctx.fillStyle = COLORS.dim;
     ctx.font = `600 15px ${FONT}`;
     ctx.fillText('MOUSE — draw ink      RIGHT-DRAG — erase      R — restart page      P — pause      M — mute', STAGE_W / 2, 340);
