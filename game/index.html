@@ -11,11 +11,49 @@
       #status { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
       #rotate-hint { display: none; position: fixed; top: 12px; left: 0; right: 0; text-align: center; color: #b8b3d9; font: 600 14px system-ui, sans-serif; pointer-events: none; z-index: 5; }
       @media (orientation: portrait) and (pointer: coarse) { #rotate-hint { display: block; } }
+      /* The Shahnameh button: a gold pill over the title screen, positioned by
+         main.js so it sits on the canvas at any window size. */
+      #about-btn { display: none; position: fixed; transform: translate(-50%, -50%); z-index: 6; background: rgba(6, 4, 18, 0.85); color: #ffd76a; border: 1px solid rgba(255, 215, 106, 0.6); border-radius: 999px; padding: 8px 18px; font: 700 13px system-ui, sans-serif; letter-spacing: 0.08em; cursor: pointer; }
+      #about-btn:hover { background: rgba(255, 215, 106, 0.15); }
+      /* The Shahnameh panel: a modal over the whole game, scrollable. */
+      #about-panel { display: none; position: fixed; inset: 0; z-index: 10; background: #060412; overflow-y: auto; color: #e8e4f0; font: 400 16px/1.6 system-ui, sans-serif; }
+      #about-panel .inner { max-width: 640px; margin: 0 auto; padding: 48px 24px 64px; }
+      #about-panel h1 { color: #ffd76a; font-size: 28px; text-align: center; margin: 0 0 4px; letter-spacing: 0.06em; }
+      #about-panel .sub { text-align: center; color: #b8b3d9; font-style: italic; margin: 0 0 28px; }
+      #about-panel h2 { color: #ffd76a; font-size: 17px; letter-spacing: 0.08em; margin: 28px 0 8px; }
+      #about-panel ol { padding-left: 24px; margin: 0; }
+      #about-panel li { margin: 10px 0; }
+      #about-panel li b { color: #ffd76a; }
+      #about-panel .credit { color: #b8b3d9; font-size: 13px; margin-top: 28px; }
+      #about-close { display: block; margin: 32px auto 0; background: transparent; color: #ffd76a; border: 1px solid rgba(255, 215, 106, 0.6); border-radius: 999px; padding: 10px 24px; font: 700 14px system-ui, sans-serif; letter-spacing: 0.08em; cursor: pointer; }
+      #about-close:hover { background: rgba(255, 215, 106, 0.15); }
     </style>
   </head>
   <body>
     <div id="wrap"><canvas id="game" width="960" height="600"></canvas></div>
     <div id="rotate-hint">📱 Rotate your phone — the game plays best sideways</div>
+    <button id="about-btn" type="button">ⓘ&nbsp; ABOUT THE SHAHNAMEH</button>
+    <div id="about-panel" role="dialog" aria-label="About the Shahnameh">
+      <div class="inner">
+        <h1>THE SHAHNAMEH</h1>
+        <p class="sub">The Book of Kings</p>
+        <p>The <i>Shahnameh</i> is the great epic of Persia, written by the poet Ferdowsi around a thousand years ago. In more than 50,000 couplets it tells the history of Iran from the first kings to the coming of Islam — and at its heart stands Rustam, the greatest hero of them all.</p>
+        <h2>THE SEVEN LABOURS</h2>
+        <p>When King Kay Kavus and his army were captured and blinded by the demons of Mazandaran, Rustam rode alone down the short, deadly road to rescue them — a road of seven trials, the Haft Khan:</p>
+        <ol>
+          <li><b>The Lion</b> — Rakhsh, Rustam's faithful horse, kills a lion while Rustam sleeps.</li>
+          <li><b>The Desert</b> — Dying of thirst, Rustam follows a ram to a hidden spring.</li>
+          <li><b>The Dragon</b> — A dragon comes three times in the night; at last Rustam sees it and cuts off its head.</li>
+          <li><b>The Witch</b> — A witch comes disguised as a beauty; Rustam names God, her true face appears, and he slays her.</li>
+          <li><b>Olad</b> — Rustam captures the warrior Olad, who becomes his guide to the White Div.</li>
+          <li><b>Arzhang</b> — Rustam storms the demons' camp and tears off the head of Arzhang, their chief.</li>
+          <li><b>The White Div</b> — Rustam wakes the White Div in its cave, wrestles it, and slays it — and its blood restores the sight of the blinded king and his army.</li>
+        </ol>
+        <p>In Lumink, Ember walks the same road — seven khans, drawn in ink.</p>
+        <p class="credit">The verses in the game are from the <i>Shahnameh</i> in the English translation of Arthur and Edmond Warner (1906).</p>
+        <button id="about-close" type="button">✕&nbsp; BACK TO THE GAME</button>
+      </div>
+    </div>
     <p id="status" role="status" aria-live="polite"></p>
     <script type="module" src="./src/main.js"></script>
   </body>

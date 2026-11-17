@@ -14,6 +14,7 @@
 - **Seven hand-made khans**, each a small puzzle and a verse of the poem, and each true to its labour: **I. The Lion** — a big amber blot guards the first gap; **II. The Desert** — thirst, so little ink that the stars are springs to drink from; **III. The Dragon** — a green shadow wakes and hunts Ember; **IV. The Witch** — a star that is not a star, unmasked as Ember draws near; **V. Olad** — a tower climb, with dashed gold lines showing the way up, as Olad showed Rustam the road; **VI. Arzhang** — the red chief of the divs, fast and wide; **VII. The White Div** — the pale, horned giant wakes with a roar and hunts Ember across four gaps while you draw the road ahead of it. Three lives, 16 stars to collect, an ink bonus for finishing a khan with ink to spare.
 - **Gold ink.** Press **G** to draw in gold: it costs 50% more, but the blots cannot eat it — spend it where a line must survive.
 - **The look is Persian miniature.** The Dawn Door is a pointed arch (iwan); the page is framed by an illuminated gold border with eight-pointed stars at the corners; cypresses stand silhouetted along the bottom; the stars themselves are eight-pointed, the khatam of Persian art.
+- **About the Shahnameh.** A button on the title screen opens a short telling of the epic — Ferdowsi, the Book of Kings, and all seven labours — for players who have never met Rustam.
 
 ## Controls
 

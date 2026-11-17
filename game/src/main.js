@@ -23,6 +23,26 @@ const seed = Number.isInteger(seedParam) ? seedParam : Math.floor(Math.random() 
 
 const canvas = document.getElementById('game');
 const status = document.getElementById('status');
+const aboutBtn = document.getElementById('about-btn');
+const aboutPanel = document.getElementById('about-panel');
+const aboutClose = document.getElementById('about-close');
+// The Shahnameh panel is a modal: while it is open, the game behind it
+// does not advance and its input is swallowed.
+let aboutOpen = false;
+function openAbout() {
+  aboutOpen = true;
+  aboutPanel.style.display = 'block';
+  aboutBtn.style.display = 'none';
+}
+function closeAbout() {
+  aboutOpen = false;
+  aboutPanel.style.display = 'none';
+}
+aboutBtn.addEventListener('click', openAbout);
+aboutClose.addEventListener('click', closeAbout);
+window.addEventListener('keydown', (e) => {
+  if (aboutOpen && (e.key === 'Escape' || e.key === 'Enter')) closeAbout();
+});
 const random = createRandom(seed);
 const world = createWorld(random);
 // Touch devices get thicker lines, a gold button and touch instructions; the
@@ -35,11 +55,15 @@ const audio = createAudio();
 const particles = createParticles();
 const renderer = createRenderer(canvas);
 
-// The stage keeps its 16:10 shape at any window size.
+// The stage keeps its 16:10 shape at any window size. The Shahnameh button
+// rides on the canvas, centred near its bottom edge.
 function fitCanvas() {
   const scale = Math.min(window.innerWidth / STAGE_W, window.innerHeight / STAGE_H);
   canvas.style.width = `${Math.floor(STAGE_W * scale)}px`;
   canvas.style.height = `${Math.floor(STAGE_H * scale)}px`;
+  const r = canvas.getBoundingClientRect();
+  aboutBtn.style.left = `${r.left + r.width / 2}px`;
+  aboutBtn.style.top = `${r.top + r.height * 0.9}px`;
 }
 window.addEventListener('resize', fitCanvas);
 fitCanvas();
@@ -111,6 +135,8 @@ function handleEvents(events) {
 
 function runShot(name) {
   stageShot(name, world);
+  // The title shot shows the Shahnameh button, as a player sees it.
+  if (name === 'start') aboutBtn.style.display = 'block';
   let painted = 0;
   function paint() {
     renderer.draw(world, particles);
@@ -140,6 +166,11 @@ if (shot) {
     while (acc >= STEP) {
       const actions = input.drainActions();
       const path = input.drainPath();
+      if (aboutOpen) {
+        // The panel is modal: swallow this frame's input, freeze the world.
+        acc -= STEP;
+        continue;
+      }
       if (actions.size > 0) audio.resume();
       if (actions.has(ACTION_MUTE)) audio.setMuted(!audio.muted);
       const events = [];
@@ -147,6 +178,8 @@ if (shot) {
       handleEvents(events);
       acc -= STEP;
     }
+    // The Shahnameh button lives only on the title screen.
+    aboutBtn.style.display = world.screen === 'title' && !aboutOpen ? 'block' : 'none';
     // Ember's trail: a ribbon of warm light while it rolls.
     frame += 1;
     if (world.screen === 'play') {
