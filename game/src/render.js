@@ -3,7 +3,7 @@
 // blots, gold stars and the home portal — plus a HUD readable at a glance and
 // the title, page-clear, pause, game-over and victory screens.
 
-import { BLOT_EAT_TIME, COLORS, LEVEL_BONUS, STAGE_H, STAGE_W } from './config.js';
+import { BLOT_EAT_TIME, COLORS, GOLD_BUTTON, LEVEL_BONUS, STAGE_H, STAGE_W } from './config.js';
 import { createRandom } from './random.js';
 import {
   GOAL_RADIUS,
@@ -212,7 +212,7 @@ export function createRenderer(canvas) {
       const fade = seg.eaten > 0 ? 1 - (seg.eaten / BLOT_EAT_TIME) * 0.65 : 1;
       ctx.globalAlpha = fade;
       ctx.strokeStyle = seg.gold ? COLORS.goldInk : COLORS.ink;
-      ctx.lineWidth = 6;
+      ctx.lineWidth = seg.thick ? 11 : 6;
       ctx.beginPath();
       ctx.moveTo(seg.x1, seg.y1);
       ctx.lineTo(seg.x2, seg.y2);
@@ -222,7 +222,7 @@ export function createRenderer(canvas) {
       const fade = seg.eaten > 0 ? 1 - (seg.eaten / BLOT_EAT_TIME) * 0.65 : 1;
       ctx.globalAlpha = fade;
       ctx.strokeStyle = seg.gold ? COLORS.goldInkCore : COLORS.inkCore;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = seg.thick ? 4 : 2;
       ctx.beginPath();
       ctx.moveTo(seg.x1, seg.y1);
       ctx.lineTo(seg.x2, seg.y2);
@@ -376,6 +376,21 @@ export function createRenderer(canvas) {
     for (let i = 0; i < world.lives; i += 1) {
       drawHeart(ctx, STAGE_W - 28 - i * 30, 32, 15, '#ff8fa3');
     }
+    // The gold button, touch only: there is no G key on a phone, so tapping
+    // here switches ink. Its rect lives in config, shared with the world.
+    if (world.touchMode) {
+      ctx.fillStyle = world.ink.gold ? 'rgba(255,215,106,0.28)' : 'rgba(255,255,255,0.08)';
+      roundRect(ctx, GOLD_BUTTON.x, GOLD_BUTTON.y, GOLD_BUTTON.w, GOLD_BUTTON.h, 8);
+      ctx.fill();
+      ctx.strokeStyle = world.ink.gold ? COLORS.goldInk : 'rgba(255,255,255,0.30)';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, GOLD_BUTTON.x, GOLD_BUTTON.y, GOLD_BUTTON.w, GOLD_BUTTON.h, 8);
+      ctx.stroke();
+      ctx.fillStyle = world.ink.gold ? COLORS.goldInk : COLORS.dim;
+      ctx.font = `800 13px ${FONT}`;
+      ctx.textAlign = 'center';
+      ctx.fillText(world.ink.gold ? '★ GOLD ON' : 'GOLD', GOLD_BUTTON.x + GOLD_BUTTON.w / 2, GOLD_BUTTON.y + 20);
+    }
     // Ink meter, bottom centre: the resource that matters most.
     const frac = world.ink.ink / world.ink.maxInk;
     const low = frac < 0.18;
@@ -400,7 +415,13 @@ export function createRenderer(canvas) {
     );
     ctx.fillStyle = COLORS.dim;
     ctx.font = `600 11px ${FONT}`;
-    ctx.fillText('DRAW with the mouse · RIGHT-DRAG erases · G gold ink · R restarts the page', STAGE_W / 2, STAGE_H - 14);
+    ctx.fillText(
+      world.touchMode
+        ? 'DRAW with your finger · TWO FINGERS erase · TAP GOLD for gold ink'
+        : 'DRAW with the mouse · RIGHT-DRAG erases · G gold ink · R restarts the page',
+      STAGE_W / 2,
+      STAGE_H - 14,
+    );
     ctx.restore();
   }
 
@@ -419,7 +440,7 @@ export function createRenderer(canvas) {
     ctx.font = `900 76px ${FONT}`;
     ctx.shadowColor = COLORS.ink;
     ctx.shadowBlur = 30;
-    ctx.fillText('INKBOUND', STAGE_W / 2, 120);
+    ctx.fillText('LUMINK', STAGE_W / 2, 120);
     ctx.shadowBlur = 0;
     ctx.fillStyle = COLORS.gold;
     ctx.font = `600 21px ${FONT}`;
@@ -430,14 +451,26 @@ export function createRenderer(canvas) {
     ctx.fillText('but ink runs out, and the shadows eat it. Eleven pages. Three lives.', STAGE_W / 2, 284);
     ctx.fillStyle = COLORS.dim;
     ctx.font = `600 15px ${FONT}`;
-    ctx.fillText('MOUSE — draw ink      RIGHT-DRAG — erase      R — restart page      P — pause      M — mute', STAGE_W / 2, 340);
+    ctx.fillText(
+      world.touchMode
+        ? 'FINGER — draw ink      TWO FINGERS — erase      TAP GOLD — gold ink'
+        : 'MOUSE — draw ink      RIGHT-DRAG — erase      R — restart page      P — pause      M — mute',
+      STAGE_W / 2,
+      340,
+    );
     ctx.fillStyle = COLORS.goldInk;
-    ctx.fillText('G — gold ink: costs 50% more, the shadows can\'t eat it', STAGE_W / 2, 366);
+    ctx.fillText(
+      world.touchMode
+        ? 'Gold ink costs 50% more, and the shadows can\'t eat it'
+        : 'G — gold ink: costs 50% more, the shadows can\'t eat it',
+      STAGE_W / 2,
+      366,
+    );
     const pulse = 0.65 + 0.35 * Math.sin(time * 3.2);
     ctx.globalAlpha = pulse;
     ctx.fillStyle = COLORS.ink;
     ctx.font = `800 22px ${FONT}`;
-    ctx.fillText('CLICK OR PRESS ENTER TO BEGIN', STAGE_W / 2, 414);
+    ctx.fillText(world.touchMode ? 'TAP TO BEGIN' : 'CLICK OR PRESS ENTER TO BEGIN', STAGE_W / 2, 414);
     ctx.globalAlpha = 1;
     if (world.best > 0) {
       ctx.fillStyle = COLORS.dim;

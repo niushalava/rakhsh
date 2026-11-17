@@ -1,6 +1,8 @@
 // Input: the pointer is the pencil. Left-drag draws ink, right-drag erases it;
 // the pointer's path is queued as points the world drains each step. Keys are
-// edge-triggered actions, so a tap never fires twice.
+// edge-triggered actions, so a tap never fires twice. On touch there is no
+// right button: one finger draws, a second finger switches the stroke to
+// erasing, and the stroke is marked touch so its lines come out thicker.
 
 import { STAGE_H, STAGE_W } from './config.js';
 
@@ -23,7 +25,8 @@ const GOLD_KEYS = new Set(['g', 'G']);
 export function createInput(canvas) {
   const queued = new Set();
   const path = [];
-  const pointer = { x: STAGE_W / 2, y: STAGE_H / 2, down: false, eraseDown: false };
+  const activePointers = new Set();
+  const pointer = { x: STAGE_W / 2, y: STAGE_H / 2, down: false, eraseDown: false, touch: false };
 
   function toStage(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
@@ -43,6 +46,18 @@ export function createInput(canvas) {
     const p = toStage(event.clientX, event.clientY);
     pointer.x = p.x;
     pointer.y = p.y;
+    activePointers.add(event.pointerId);
+    pointer.touch = event.pointerType === 'touch';
+    if (pointer.touch && activePointers.size > 1) {
+      // A second finger: the stroke becomes an eraser (touch has no right-drag).
+      if (pointer.down) queued.add(ACTION_DRAW_END);
+      pointer.down = false;
+      pointer.eraseDown = true;
+      queued.add(ACTION_ERASE_START);
+      path.length = 0;
+      path.push({ x: p.x, y: p.y });
+      return;
+    }
     if (event.button === 2) {
       pointer.eraseDown = true;
       queued.add(ACTION_ERASE_START);
@@ -54,14 +69,20 @@ export function createInput(canvas) {
       path.push({ x: p.x, y: p.y });
     }
   });
-  function endStroke() {
+  function endStroke(event) {
+    if (event && event.pointerId !== undefined) activePointers.delete(event.pointerId);
+    if (activePointers.size > 0) return; // another finger is still down
     if (pointer.down) queued.add(ACTION_DRAW_END);
     if (pointer.eraseDown) queued.add(ACTION_ERASE_END);
     pointer.down = false;
     pointer.eraseDown = false;
   }
   window.addEventListener('pointerup', endStroke);
-  window.addEventListener('blur', endStroke);
+  window.addEventListener('pointercancel', endStroke);
+  window.addEventListener('blur', () => {
+    activePointers.clear();
+    endStroke();
+  });
   canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
   window.addEventListener('keydown', (event) => {

@@ -23,9 +23,9 @@ export function createInkStore(maxInk) {
   };
 }
 
-export function beginStroke(store, x, y) {
+export function beginStroke(store, x, y, thick = false) {
   if (store.ink <= 0) return;
-  store.current = { id: store.nextStroke, gold: store.gold, points: [{ x, y }] };
+  store.current = { id: store.nextStroke, gold: store.gold, thick, points: [{ x, y }] };
   store.nextStroke += 1;
 }
 
@@ -53,7 +53,7 @@ export function extendStroke(store, x, y) {
     store.ink -= cost;
     store.segments.push({
       x1: last.x, y1: last.y, x2: nx, y2: ny,
-      cost, eaten: 0, stroke: stroke.id, gold: stroke.gold,
+      cost, eaten: 0, stroke: stroke.id, gold: stroke.gold, thick: stroke.thick,
     });
     stroke.points.push({ x: nx, y: ny });
     added += 1;

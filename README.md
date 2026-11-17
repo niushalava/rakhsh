@@ -1,10 +1,10 @@
-# Inkbound
+# Lumink
 
 [![made with make.fun](https://make.fun/badge.svg)](https://make.fun/bounty/best-game-01?ref=3gb94rxd)
 [![Competition: best-game-01](https://make.fun/badge-competition-best-game-01.svg)](https://make.fun/bounty/best-game-01?ref=3gb94rxd)
 [![Built by AI](https://make.fun/badge-built-by-ai.svg)](https://make.fun?ref=3gb94rxd)
 
-**Inkbound** is a drawing game: Ember, a little light, is lost in a dark paper world, and the only way home is the ink you draw. Drag with the mouse to draw bridges, ramps and arcs of glowing ink for Ember to roll on — but ink runs out, and the shadow blots eat it.
+**Lumink** is a drawing game: Ember, a little light, is lost in a dark paper world, and the only way home is the ink you draw. Drag with the mouse to draw bridges, ramps and arcs of glowing ink for Ember to roll on — but ink runs out, and the shadow blots eat it.
 
 ## How it plays
 

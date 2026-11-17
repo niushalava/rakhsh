@@ -6,12 +6,14 @@
 import {
   BEST_KEY,
   FALL_Y,
+  GOLD_BUTTON,
   HIT_INVULNERABLE,
   INK_BONUS_PER,
   INK_STAR_BONUS,
   LEVEL_BONUS,
   LIVES_START,
   STAR_SCORE,
+  TOUCH_ERASE_RADIUS,
 } from './config.js';
 import { LEVELS, levelCount } from './levels.js';
 import { createEmber, updateEmber } from './physics.js';
@@ -67,6 +69,7 @@ export function createWorld(random) {
     time: 0,
     levelTime: 0,
     dryNotified: false,
+    touchMode: false, // set by the boot code on coarse pointers (phones, tablets)
   };
   try {
     world.best = Number.parseInt(window.localStorage.getItem(BEST_KEY) ?? '0', 10) || 0;
@@ -169,6 +172,11 @@ function levelCleared(world, events) {
   }
 }
 
+function inGoldButton(p) {
+  return p.x >= GOLD_BUTTON.x && p.x <= GOLD_BUTTON.x + GOLD_BUTTON.w
+    && p.y >= GOLD_BUTTON.y && p.y <= GOLD_BUTTON.y + GOLD_BUTTON.h;
+}
+
 // One fixed step. `actions` is the set of edge-triggered actions since the last
 // step, `path` the pointer points queued since then; `events` collects what
 // happened for particles and sound.
@@ -234,13 +242,23 @@ export function updateWorld(world, input, actions, path, dt, events) {
     events.push({ type: 'gold', on: world.ink.gold, x: input.pointer.x, y: input.pointer.y });
   }
 
-  // Drawing and erasing follow the pointer's queued path.
-  if (actions.has(ACTION_DRAW_START)) beginStroke(world.ink, input.pointer.x, input.pointer.y);
+  // Drawing and erasing follow the pointer's queued path. On touch, a tap on
+  // the gold button switches ink instead of starting a line, and finger-drawn
+  // lines come out thicker (input.pointer.touch marks the stroke).
+  if (actions.has(ACTION_DRAW_START)) {
+    if (world.touchMode && inGoldButton(input.pointer)) {
+      world.ink.gold = !world.ink.gold;
+      events.push({ type: 'gold', on: world.ink.gold, x: input.pointer.x, y: input.pointer.y });
+    } else {
+      beginStroke(world.ink, input.pointer.x, input.pointer.y, input.pointer.touch);
+    }
+  }
   if (actions.has(ACTION_DRAW_END)) endStroke(world.ink);
   const erasing = input.pointer.eraseDown || actions.has(ACTION_ERASE_START);
+  const eraseRadius = input.pointer.touch ? TOUCH_ERASE_RADIUS : 20;
   for (const p of path) {
     if (erasing) {
-      const n = eraseAt(world.ink, p.x, p.y);
+      const n = eraseAt(world.ink, p.x, p.y, eraseRadius);
       if (n > 0) events.push({ type: 'erased', x: p.x, y: p.y });
     } else if (input.pointer.down) {
       const added = extendStroke(world.ink, p.x, p.y);

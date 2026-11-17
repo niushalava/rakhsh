@@ -12,6 +12,7 @@ import {
   ROLL_ACCEL,
   ROLL_SPEED,
   STAGE_W,
+  TOUCH_SEGMENT_EXTRA,
 } from './config.js';
 
 export function createEmber(x, y) {
@@ -43,10 +44,12 @@ export function collideSegments(ember, segments) {
   for (let pass = 0; pass < 2; pass += 1) {
     for (const seg of segments) {
       const c = closestOnSegment(ember.x, ember.y, seg);
+      // Touch-drawn lines are thicker, so Ember feels them from further out.
+      const r = ember.radius + (seg.thick ? TOUCH_SEGMENT_EXTRA : 0);
       let nx = ember.x - c.x;
       let ny = ember.y - c.y;
       let dist = Math.hypot(nx, ny);
-      if (dist >= ember.radius) continue;
+      if (dist >= r) continue;
       if (dist < 0.001) {
         // Dead centre on the segment: push along its normal instead.
         const dx = seg.x2 - seg.x1;
@@ -59,8 +62,8 @@ export function collideSegments(ember, segments) {
         nx /= dist;
         ny /= dist;
       }
-      ember.x += nx * (ember.radius - dist);
-      ember.y += ny * (ember.radius - dist);
+      ember.x += nx * (r - dist);
+      ember.y += ny * (r - dist);
       const vn = ember.vx * nx + ember.vy * ny;
       if (vn < 0) {
         ember.vx -= (1 + RESTITUTION) * vn * nx;

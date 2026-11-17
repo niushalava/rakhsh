@@ -25,8 +25,11 @@ const canvas = document.getElementById('game');
 const status = document.getElementById('status');
 const random = createRandom(seed);
 const world = createWorld(random);
+// Touch devices get thicker lines, a gold button and touch instructions; the
+// desktop game the judges play is untouched.
+world.touchMode = window.matchMedia('(pointer: coarse)').matches;
 // A debug hook for play-testing: the live world, readable from the console.
-window.__inkbound = { world };
+window.__lumink = { world };
 const input = createInput(canvas);
 const audio = createAudio();
 const particles = createParticles();
@@ -46,7 +49,7 @@ function announce() {
   if (world.screen === lastScreen) return;
   lastScreen = world.screen;
   const lines = {
-    title: 'Inkbound. Press Enter or click to start.',
+    title: 'Lumink. Press Enter or click to start.',
     play: `Page ${world.levelIndex + 1}. Score ${world.score}.`,
     clear: 'Page clear. Press Enter for the next page.',
     paused: 'Paused.',

@@ -1,4 +1,4 @@
-// Tuning for Inkbound: one place for every number the game balances on.
+// Tuning for Lumink: one place for every number the game balances on.
 // Sizes are in logical pixels; the renderer scales the 960x600 stage to the window.
 
 export const STAGE_W = 960;
@@ -27,6 +27,13 @@ export const INK_REGEN = 7; // ink per second, always trickling back
 export const INK_STAR_BONUS = 25; // a star refills this much ink
 export const DRAW_SPACING = 14; // px between polyline points while drawing
 export const ERASE_REFUND = 0.5; // erasing your own line refunds half its ink
+
+// Touch: a finger is a clumsier pencil than a mouse, so finger-drawn lines are
+// thicker (easier to draw and to roll on), erasing reaches further, and the
+// gold button stands in for the G key. None of this touches mouse play.
+export const TOUCH_SEGMENT_EXTRA = 5; // extra collision radius of touch-drawn lines
+export const TOUCH_ERASE_RADIUS = 28; // erase radius for a finger (mouse: 20)
+export const GOLD_BUTTON = { x: 848, y: 52, w: 92, h: 30 }; // top right, under the hearts
 
 // Blots: shadows that eat ink and hurt Ember.
 export const BLOT_EAT_TIME = 0.4; // seconds of contact to eat one segment
@@ -61,5 +68,5 @@ export const COLORS = {
   gold: '#ffd76a',
 };
 
-export const BEST_KEY = 'inkbound-best';
-export const MUTE_KEY = 'inkbound-muted';
+export const BEST_KEY = 'lumink-best';
+export const MUTE_KEY = 'lumink-muted';
