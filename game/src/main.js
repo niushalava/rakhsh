@@ -85,6 +85,10 @@ function handleEvents(events) {
     } else if (event.type === 'hit') {
       particles.burst(event.x, event.y, '#ff6b6b', 20, 280, 4, 0.8);
       audio.hit();
+    } else if (event.type === 'mawWake') {
+      particles.burst(event.x, event.y, '#c026d3', 30, 320, 4, 0.9);
+      particles.addText(event.x, event.y - 46, 'THE MAW WAKES!', '#ff5a5a');
+      audio.roar();
     } else if (event.type === 'fall') {
       audio.fall();
     } else if (event.type === 'levelClear') {

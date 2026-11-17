@@ -237,10 +237,24 @@ export function createRenderer(canvas) {
       const pulse = 1 + 0.15 * Math.sin(time * 3 + s.x);
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
+      // A breathing halo ring, so a star is unmissable even in the dark.
+      const halo = 0.35 + 0.2 * Math.sin(time * 2.4 + s.x * 1.3);
+      ctx.globalAlpha = halo;
+      ctx.strokeStyle = COLORS.star;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 24 + 3 * Math.sin(time * 2.4 + s.x * 1.3), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
       ctx.shadowColor = COLORS.star;
-      ctx.shadowBlur = 18;
+      ctx.shadowBlur = 26;
       ctx.fillStyle = COLORS.star;
-      drawStar(ctx, s.x, s.y, 13 * pulse, time * 0.6);
+      drawStar(ctx, s.x, s.y, 16 * pulse, time * 0.6);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = '#fff8dc';
+      drawStar(ctx, s.x, s.y, 7 * pulse, -time * 0.9);
       ctx.fill();
       ctx.restore();
     }
@@ -278,9 +292,31 @@ export function createRenderer(canvas) {
     ctx.restore();
   }
 
-  function drawBlots(blots, time) {
+  function drawBlots(blots, time, ember) {
     for (const b of blots) {
       const rimColor = b.maw ? '#c026d3' : COLORS.blot;
+      const es = b.radius / 16;
+      // A wisp tail: smoke trailing behind the blot's motion, so a shadow
+      // reads as something alive and moving, not a still blob.
+      const mdx = b.x - b.prevX;
+      const mdy = b.y - b.prevY;
+      const mdist = Math.hypot(mdx, mdy);
+      if (!b.sleeping && mdist > 0.02) {
+        const nx = mdx / mdist;
+        const ny = mdy / mdist;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        for (let i = 1; i <= 3; i += 1) {
+          const tx = b.x - nx * i * b.radius * 0.55;
+          const ty = b.y - ny * i * b.radius * 0.55 + Math.sin(time * 5 + i * 2) * 2;
+          ctx.globalAlpha = 0.28 - i * 0.07;
+          ctx.fillStyle = rimColor;
+          ctx.beginPath();
+          ctx.arc(tx, ty, b.radius * (0.5 - i * 0.1), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
       ctx.save();
       if (b.sleeping) ctx.globalAlpha = 0.7;
       ctx.globalCompositeOperation = 'lighter';
@@ -295,6 +331,21 @@ export function createRenderer(canvas) {
       ctx.restore();
       ctx.save();
       if (b.sleeping) ctx.globalAlpha = 0.75;
+      // The Maw wears horns.
+      if (b.maw) {
+        ctx.fillStyle = COLORS.blotCore;
+        ctx.strokeStyle = rimColor;
+        ctx.lineWidth = 2;
+        for (const side of [-1, 1]) {
+          ctx.beginPath();
+          ctx.moveTo(b.x + side * 7 * es, b.y - 20 * es);
+          ctx.lineTo(b.x + side * 19 * es, b.y - 33 * es);
+          ctx.lineTo(b.x + side * 15 * es, b.y - 16 * es);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
       ctx.fillStyle = COLORS.blotCore;
       ctx.strokeStyle = rimColor;
       ctx.lineWidth = 2;
@@ -312,8 +363,7 @@ export function createRenderer(canvas) {
       ctx.fill();
       ctx.stroke();
       // Eyes scale with the blot; the Maw's burn red, and a sleeping blot's
-      // are shut.
-      const es = b.radius / 16;
+      // are shut. Awake eyes watch Ember — the pupils lean toward the light.
       if (b.sleeping) {
         ctx.strokeStyle = '#e8d5ff';
         ctx.lineWidth = 2;
@@ -324,15 +374,33 @@ export function createRenderer(canvas) {
         ctx.lineTo(b.x + 7 * es, b.y - 2);
         ctx.stroke();
       } else {
+        const lookX = ember ? Math.max(-1, Math.min(1, (ember.x - b.x) / 60)) : 0;
+        const lookY = ember ? Math.max(-1, Math.min(1, (ember.y - b.y) / 60)) : 0;
         ctx.fillStyle = b.maw ? '#ff5a5a' : '#e8d5ff';
         if (b.maw) {
           ctx.shadowColor = '#ff5a5a';
           ctx.shadowBlur = 10;
         }
         ctx.beginPath();
-        ctx.arc(b.x - 5 * es, b.y - 2, 2.6 * es, 0, Math.PI * 2);
-        ctx.arc(b.x + 5 * es, b.y - 2, 2.6 * es, 0, Math.PI * 2);
+        ctx.arc(b.x - 5 * es + lookX * 1.5 * es, b.y - 2 + lookY * 1.5 * es, 2.6 * es, 0, Math.PI * 2);
+        ctx.arc(b.x + 5 * es + lookX * 1.5 * es, b.y - 2 + lookY * 1.5 * es, 2.6 * es, 0, Math.PI * 2);
         ctx.fill();
+        ctx.shadowBlur = 0;
+        // The Maw's mouth: a jagged grin that shows once it hunts.
+        if (b.maw) {
+          const mw = 12 * es;
+          const my = b.y + 10 * es;
+          ctx.strokeStyle = '#ff5a5a';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(b.x - mw, my);
+          for (let i = 0; i < 4; i += 1) {
+            const x0 = b.x - mw + (2 * mw * i) / 4;
+            ctx.lineTo(x0 + mw / 4, my + 4 * es);
+            ctx.lineTo(x0 + mw / 2, my);
+          }
+          ctx.stroke();
+        }
       }
       ctx.restore();
     }
@@ -422,6 +490,26 @@ export function createRenderer(canvas) {
       STAGE_W / 2,
       STAGE_H - 14,
     );
+    // The story, told as the game goes: the page's beat at its start, and the
+    // funny line of each star Ember picks up. Both fade out on their own.
+    if (world.screen === SCREEN_PLAY && world.pageStory) {
+      const a = world.pageStory.t < 3 ? 1 : Math.max(0, 1 - (world.pageStory.t - 3));
+      ctx.globalAlpha = a;
+      ctx.fillStyle = COLORS.gold;
+      ctx.font = `italic 600 15px ${FONT}`;
+      ctx.textAlign = 'center';
+      ctx.fillText(world.pageStory.text, STAGE_W / 2, 64);
+      ctx.globalAlpha = 1;
+    }
+    if (world.screen === SCREEN_PLAY && world.starLine) {
+      const a = world.starLine.t < 2.2 ? 1 : Math.max(0, 1 - (world.starLine.t - 2.2) / 0.8);
+      ctx.globalAlpha = a;
+      ctx.fillStyle = COLORS.star;
+      ctx.font = `700 16px ${FONT}`;
+      ctx.textAlign = 'center';
+      ctx.fillText(world.starLine.text, STAGE_W / 2, 90);
+      ctx.globalAlpha = 1;
+    }
     ctx.restore();
   }
 
@@ -447,8 +535,8 @@ export function createRenderer(canvas) {
     ctx.fillText('Draw the way home.', STAGE_W / 2, 210);
     ctx.fillStyle = COLORS.text;
     ctx.font = `500 17px ${FONT}`;
-    ctx.fillText('Ember is lost in the dark. Draw bridges of ink to guide the little light home —', STAGE_W / 2, 258);
-    ctx.fillText('but ink runs out, and the shadows eat it. Eleven pages. Three lives.', STAGE_W / 2, 284);
+    ctx.fillText('The Paper Sky went dark. Ember, the last little light, must cross eleven', STAGE_W / 2, 258);
+    ctx.fillText('pages of night to reach the Dawn Door — but ink runs out, and shadows eat it.', STAGE_W / 2, 284);
     ctx.fillStyle = COLORS.dim;
     ctx.font = `600 15px ${FONT}`;
     ctx.fillText(
@@ -539,6 +627,9 @@ export function createRenderer(canvas) {
     ctx.fillStyle = COLORS.dim;
     ctx.font = `600 17px ${FONT}`;
     ctx.fillText(`BEST ${world.best.toLocaleString('en-US')}      PAGE ${world.levelIndex + 1}/${levelCount()}`, STAGE_W / 2, 280);
+    ctx.fillStyle = COLORS.text;
+    ctx.font = `500 16px ${FONT}`;
+    ctx.fillText('The dark wins this page. But Ember always gets back up.', STAGE_W / 2, 316);
     ctx.fillStyle = COLORS.ink;
     ctx.font = `800 21px ${FONT}`;
     ctx.fillText('PRESS R OR CLICK TO TRY AGAIN', STAGE_W / 2, 360);
@@ -565,7 +656,10 @@ export function createRenderer(canvas) {
     ctx.fillText(`BEST ${world.best.toLocaleString('en-US')}      ${world.starsTotal} STARS COLLECTED`, STAGE_W / 2, 292);
     ctx.fillStyle = COLORS.text;
     ctx.font = `500 17px ${FONT}`;
-    ctx.fillText('Ember is home. Every page, every star, every line of ink — yours.', STAGE_W / 2, 336);
+    ctx.fillText('The Dawn Door opens, and the Paper Sky lights up again.', STAGE_W / 2, 336);
+    ctx.fillStyle = COLORS.dim;
+    ctx.font = `500 15px ${FONT}`;
+    ctx.fillText('The shadows went back to sleep. Probably.', STAGE_W / 2, 364);
     ctx.fillStyle = COLORS.ink;
     ctx.font = `800 21px ${FONT}`;
     ctx.fillText('PRESS R OR CLICK TO PLAY AGAIN', STAGE_W / 2, 400);
@@ -587,7 +681,7 @@ export function createRenderer(canvas) {
       drawPortal(world.goal, world.time);
       drawStars(world.stars, world.time);
       drawInk(world.ink.segments);
-      drawBlots(world.blots, world.time);
+      drawBlots(world.blots, world.time, world.ember);
       drawEmber(world.ember, world.time);
       particles.draw(ctx);
       ctx.restore();

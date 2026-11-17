@@ -70,6 +70,8 @@ export function createWorld(random) {
     levelTime: 0,
     dryNotified: false,
     touchMode: false, // set by the boot code on coarse pointers (phones, tablets)
+    pageStory: null, // { text, t } — the page's story beat, shown at its start
+    starLine: null, // { text, t } — the funny line of the last star picked up
   };
   try {
     world.best = Number.parseInt(window.localStorage.getItem(BEST_KEY) ?? '0', 10) || 0;
@@ -97,6 +99,8 @@ export function loadLevel(world, index) {
   world.clearInfo = null;
   world.levelTime = 0;
   world.dryNotified = false;
+  world.pageStory = { text: level.story, t: 0 };
+  world.starLine = null;
 }
 
 function saveBest(world) {
@@ -183,6 +187,15 @@ function inGoldButton(p) {
 export function updateWorld(world, input, actions, path, dt, events) {
   world.time += dt;
   world.shake = Math.max(0, world.shake - dt * 34);
+  // The story beat and the star line fade out on their own clocks.
+  if (world.pageStory) {
+    world.pageStory.t += dt;
+    if (world.pageStory.t > 4) world.pageStory = null;
+  }
+  if (world.starLine) {
+    world.starLine.t += dt;
+    if (world.starLine.t > 3) world.starLine = null;
+  }
 
   if (world.screen === SCREEN_TITLE) {
     // Ember idles on the first page behind the title: the world is alive.
@@ -276,7 +289,15 @@ export function updateWorld(world, input, actions, path, dt, events) {
   if (world.ink.ink > 5) world.dryNotified = false;
   regenerateInk(world.ink, dt);
 
-  for (const blot of world.blots) updateBlot(blot, dt, world.ember, world.levelTime);
+  for (const blot of world.blots) {
+    updateBlot(blot, dt, world.ember, world.levelTime);
+    // The Maw waking is a moment: a roar, a shake, a burst of dark light.
+    if (blot.justWoke) {
+      blot.justWoke = false;
+      world.shake = 12;
+      events.push({ type: 'mawWake', x: blot.x, y: blot.y });
+    }
+  }
   for (const blot of world.blots) {
     if (blot.sleeping) continue; // a sleeping shadow neither eats nor hunts
     const eaten = blotEat(world.ink, blot, dt);
@@ -299,6 +320,7 @@ export function updateWorld(world, input, actions, path, dt, events) {
       world.score += STAR_SCORE;
       world.levelScore += STAR_SCORE;
       world.ink.ink = Math.min(world.ink.maxInk, world.ink.ink + INK_STAR_BONUS);
+      world.starLine = { text: star.line, t: 0 };
       events.push({ type: 'star', x: star.x, y: star.y, count: world.levelStars });
     }
   }

@@ -11,6 +11,8 @@ export function createBlot(def) {
     baseY: def.y,
     x: def.x,
     y: def.y,
+    prevX: def.x,
+    prevY: def.y,
     axis: def.axis ?? 'x',
     range: def.range ?? 0,
     speed: def.speed,
@@ -19,6 +21,7 @@ export function createBlot(def) {
     wake: def.wake ?? 0,
     maw: def.maw ?? false,
     sleeping: (def.wake ?? 0) > 0,
+    justWoke: false,
     radius: def.radius ?? BLOT_RADIUS,
     wobble: Math.random() * Math.PI * 2,
   };
@@ -28,19 +31,26 @@ export function createBlot(def) {
 export function resetBlot(blot) {
   blot.x = blot.baseX;
   blot.y = blot.baseY;
+  blot.prevX = blot.baseX;
+  blot.prevY = blot.baseY;
   blot.phase = 0;
   blot.sleeping = blot.wake > 0;
+  blot.justWoke = false;
 }
 
 // `target` is Ember (for chase blots); `levelTime` is the seconds since the
 // page started (for the wake delay).
 export function updateBlot(blot, dt, target, levelTime) {
   blot.wobble += dt * 3;
+  blot.prevX = blot.x;
+  blot.prevY = blot.y;
   if (blot.mode === 'chase') {
     if (levelTime < blot.wake) {
       blot.sleeping = true;
       return;
     }
+    // The first frame awake: the world turns this into a roar and a shake.
+    if (blot.sleeping) blot.justWoke = true;
     blot.sleeping = false;
     if (!target) return;
     // Straight at Ember, at a fixed speed — it never accelerates, so a clear

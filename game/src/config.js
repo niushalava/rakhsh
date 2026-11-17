@@ -45,13 +45,14 @@ export const STAR_SCORE = 100;
 export const LEVEL_BONUS = 250;
 export const INK_BONUS_PER = 2; // remaining ink is worth this each at level clear
 
-// Palette: a dark paper world — indigo night, cyan ink, amber ember, gold stars.
+// Palette: a dark paper world — a deep night sky, cyan ink, amber ember,
+// gold stars. The darker the page, the brighter the light reads.
 export const COLORS = {
-  bg0: '#0d0b1e',
-  bg1: '#171233',
-  paper: '#221c46',
-  platform: '#3a3458',
-  platformTop: '#6b6390',
+  bg0: '#060412',
+  bg1: '#0d091f',
+  paper: '#150f30',
+  platform: '#2a2348',
+  platformTop: '#575080',
   ink: '#6ef3ff',
   inkCore: '#e8feff',
   goldInk: '#ffd76a',
