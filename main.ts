@@ -1,4 +1,4 @@
-// Lumink's entrypoint (Node 22, standard library only). The game is this
+// Rakhsh's entrypoint (Node 22, standard library only). The game is this
 // directory's game/ folder — plain static files a desktop browser loads offline —
 // and this program hands it in: it copies game/ and screenshots/ from beside
 // this file to /output and writes /output/dossier.json, the summary the judge

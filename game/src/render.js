@@ -616,7 +616,7 @@ export function createRenderer(canvas) {
     ctx.font = `900 76px ${FONT}`;
     ctx.shadowColor = COLORS.ink;
     ctx.shadowBlur = 30;
-    ctx.fillText('LUMINK', STAGE_W / 2, 120);
+    ctx.fillText('RAKHSH', STAGE_W / 2, 120);
     ctx.shadowBlur = 0;
     ctx.fillStyle = COLORS.gold;
     ctx.font = `600 21px ${FONT}`;

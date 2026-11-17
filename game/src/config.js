@@ -1,4 +1,4 @@
-// Tuning for Lumink: one place for every number the game balances on.
+// Tuning for Rakhsh: one place for every number the game balances on.
 // Sizes are in logical pixels; the renderer scales the 960x600 stage to the window.
 
 export const STAGE_W = 960;
@@ -69,5 +69,5 @@ export const COLORS = {
   gold: '#ffd76a',
 };
 
-export const BEST_KEY = 'lumink-best';
-export const MUTE_KEY = 'lumink-muted';
+export const BEST_KEY = 'rakhsh-best';
+export const MUTE_KEY = 'rakhsh-muted';
